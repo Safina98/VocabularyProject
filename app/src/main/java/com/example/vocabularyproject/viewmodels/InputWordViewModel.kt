@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,6 +25,9 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
     val iWordsListL= iWordsListM.asStateFlow()
     val eWordM=  MutableStateFlow<String>("")
     val definitionM=MutableStateFlow<String>("")
+
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery = _searchQuery.asStateFlow()
 
     val englishWords: StateFlow<List<EnglishWordsTable>> =
         repository.getAllEnglishWords()
@@ -102,5 +106,24 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
         iWordsListM.value= emptyList()
         eWordM.value=""
         definitionM.value=""
+    }
+
+    val filteredWords = combine(wtModelList, _searchQuery) { words, query ->
+        if (query.isBlank()) {
+            words
+        } else {
+            words.filter { item ->
+                item.english.eWord.contains(query, ignoreCase = true) ||
+                        item.indonesianWords.any { it.iWord.contains(query, ignoreCase = true) }
+            }
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
+
+    fun onSearchQueryChange(newQuery: String) {
+        _searchQuery.value = newQuery
     }
 }
