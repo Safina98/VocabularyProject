@@ -19,8 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InputWordViewModel @Inject constructor( private val repository: VocabularyRepository) :
-    ViewModel()
-{
+    ViewModel() {
     val iWordsListM= MutableStateFlow<List<String>>(emptyList())
     val iWordsListL= iWordsListM.asStateFlow()
     val eWordM=  MutableStateFlow<String>("")
@@ -28,6 +27,13 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
 
     val englishWords: StateFlow<List<EnglishWordsTable>> =
         repository.getAllEnglishWords()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = emptyList()
+            )
+    val wtModelList =
+        repository.getWordTranslationList()
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
@@ -50,30 +56,45 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
 
     fun addWord(word:String) {
         iWordsListM.value=iWordsListM.value+word
+        Log.i("InputKataScreen","VM  Add Word ${iWordsListM.value}")
     }
 
     fun saveWord() {
         viewModelScope.launch {
-            val eWTable= EnglishWordsTable()
-            eWTable.eId=System.currentTimeMillis()
-            eWTable.eWord=eWordM.value
-            eWTable.definition=definitionM.value
-            repository.insertEnglishWord(eWTable)
+            Log.i("InputKataScreen","VM SaveWord called")
 
-            var i =1
-            iWordsListM.value.forEach {
-                val iWTable= IndonesianWordsTable()
-                val crTable= CorrelatedWord()
-              Log.i("InputWordVm","$i $it")
-              i+=1
-                iWTable.iId=System.currentTimeMillis()
-                iWTable.iWord=it
+            val eId = System.currentTimeMillis()
+
+            val eWTable = EnglishWordsTable(
+                eId = eId,
+                eWord = eWordM.value,
+                definition = definitionM.value
+            )
+
+            repository.insertEnglishWord(eWTable)
+            Log.i("InputKataScreen","VM ${iWordsListM.value}")
+            iWordsListM.value.forEach { word ->
+
+                val iId = System.currentTimeMillis()
+
+                val iWTable = IndonesianWordsTable(
+                    iId = iId,
+                    iWord = word
+                )
+                Log.i("InputKataScreen","VM ${iWTable.iId} ${iWTable.iWord}")
+
                 repository.insertIndonesianWord(iWTable)
-                crTable.eId=eWTable.eId
-                crTable.iId=iWTable.iId
+
+                val crTable = CorrelatedWord(
+                    eId = eId,
+                    iId = iId
+                )
+
                 repository.insertCorrelatedWord(crTable)
-                delay(1)
+
+                delay(1) // still ok if you want unique timestamps
             }
+            resetValues()
         }
     }
 

@@ -14,7 +14,10 @@ import com.example.vocabularyproject.ui.widgetstyles.HomeScreenButtonStyles
 import com.example.vocabularyproject.ui.theme.VocabularyProjectTheme
 
 @Composable
-fun HomeScreen( onInputKataClick: () -> Unit){
+fun HomeScreen(
+    onInputKataClick: () -> Unit,
+    onDaftarKataClick: () -> Unit,
+    ){
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center, // Centers vertically
@@ -35,10 +38,7 @@ fun HomeScreen( onInputKataClick: () -> Unit){
             gradientColors = listOf(Color(0xFF1C0838),Color(0xFF1A7067), Color(0xFF4C6461))
         )
         HomeScreenButtonStyles("Lihat Daftar Kata",
-            onClick = {
-                //Navigate to DaftarKata Screen
-                Log.i("HomeScreen","Lihat Daftar Kata clicked")
-                      },
+            onClick = onDaftarKataClick,
             modifier = Modifier.fillMaxWidth(),
             gradientColors = listOf(Color(0xFF1C0838),Color(0xFF1A7067), Color(0xFF4C6461))
         )
@@ -52,6 +52,6 @@ fun HomeScreen( onInputKataClick: () -> Unit){
 fun HomeScreenPreview() {
     // Wrap it in your App Theme so it looks correct
     VocabularyProjectTheme() {
-        HomeScreen({})
+        HomeScreen({},{})
     }
 }

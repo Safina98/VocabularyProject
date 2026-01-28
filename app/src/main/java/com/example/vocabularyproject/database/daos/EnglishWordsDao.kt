@@ -3,7 +3,9 @@ package com.example.vocabularyproject.database.daos
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import com.example.vocabularyproject.database.models.WordTranslationModel
 import com.example.vocabularyproject.database.tables.EnglishWordsTable
 import kotlinx.coroutines.flow.Flow
 
@@ -21,6 +23,10 @@ interface EnglishWordsDao {
 
     @Query("SELECT * FROM english_words")
     fun getEnglishWords(): Flow<List<EnglishWordsTable>>
+
+    @Transaction
+    @Query("SELECT * FROM english_words")
+    fun getWordTranslationList(): Flow<List<WordTranslationModel>>
 
 
 }

@@ -24,10 +24,14 @@ import com.example.vocabularyproject.ui.widgetstyles.AddButton
 import com.example.vocabularyproject.ui.widgetstyles.HomeScreenButtonStyles
 import com.example.vocabularyproject.viewmodels.InputWordViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.vocabularyproject.ui.widgetstyles.TransparentButton
 
 
 @Composable
-fun InputKataScreen(iWViewModel: InputWordViewModel = hiltViewModel()) {
+fun InputKataScreen(
+    iWViewModel: InputWordViewModel = hiltViewModel(),
+    onDaftarKataClick: () -> Unit = {}
+    ) {
     var showDialog by remember { mutableStateOf(false) }
 
     val words by iWViewModel.iWordsListL.collectAsState()
@@ -81,10 +85,17 @@ fun InputKataScreen(iWViewModel: InputWordViewModel = hiltViewModel()) {
         HomeScreenButtonStyles("Save",
             onClick = {
                 iWViewModel.saveWord()
+
             },
             modifier = Modifier.fillMaxWidth(),
             gradientColors = listOf(Color(0xFF1C0838),Color(0xFF1A7067), Color(0xFF4C6461))
         )
+        TransparentButton(
+            "Lihat Daftar Kata",
+            onClick = onDaftarKataClick,
+            modifier = Modifier.fillMaxWidth()
+        )
+
         if (showDialog) {
             AddWordDialog(
                 onDismiss = { showDialog = false },
@@ -102,5 +113,5 @@ fun InputKataScreen(iWViewModel: InputWordViewModel = hiltViewModel()) {
 @Preview(showBackground = true)
 @Composable
 fun InputKataScreenPreview() {
-    InputKataScreen()
+    InputKataScreen(hiltViewModel(),{})
 }

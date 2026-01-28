@@ -1,8 +1,10 @@
 package com.example.vocabularyproject.database
 
+import android.util.Log
 import com.example.vocabularyproject.database.daos.CorrelatedWordsDao
 import com.example.vocabularyproject.database.daos.EnglishWordsDao
 import com.example.vocabularyproject.database.daos.IndonesianWordsDao
+import com.example.vocabularyproject.database.models.WordTranslationModel
 import com.example.vocabularyproject.database.tables.CorrelatedWord
 import com.example.vocabularyproject.database.tables.EnglishWordsTable
 import com.example.vocabularyproject.database.tables.IndonesianWordsTable
@@ -30,11 +32,14 @@ class VocabularyRepository @Inject constructor(
      }
     fun getAllEnglishWords(): Flow<List<EnglishWordsTable>> =
         englishWordsDao.getEnglishWords()
+    fun getWordTranslationList(): Flow<List<WordTranslationModel>> =
+        englishWordsDao.getWordTranslationList()
 
 
     //////////////////////////////////////////////////////////////////////////////////
     suspend fun insertIndonesianWord(indonesianWord: IndonesianWordsTable) {
         withContext(Dispatchers.IO){
+            Log.i("InputKataScreen","Repo insert called")
             indonesianWordsDao.insert(indonesianWord)
         }
     }
@@ -50,6 +55,7 @@ class VocabularyRepository @Inject constructor(
 
     suspend fun insertCorrelatedWord(correlatedWord: CorrelatedWord){
         withContext(Dispatchers.IO){
+            Log.i("InputKataScreen","Repo insert called")
             correlatedWordsDao.insert(correlatedWord)
         }
     }

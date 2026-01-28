@@ -21,20 +21,23 @@ fun MainScreen() {
             HomeScreen(
                 onInputKataClick = {
                     navController.navigate(Screen.InputKata.route)
+                },
+                onDaftarKataClick = {
+                    navController.navigate(Screen.DaftarKata.route)
                 }
             )
         }
 
         composable(Screen.InputKata.route) {
-            InputKataScreen()
+            InputKataScreen(
+                onDaftarKataClick = {
+                    navController.navigate(Screen.DaftarKata.route)
+                }
+            )
+        }
+        composable(Screen.DaftarKata.route) {
+            DaftarKataScreen()
         }
 
-//        composable(Screen.TebakKata.route) {
-//            TebakKataScreen()
-//        }
-//
-//        composable(Screen.DaftarKata.route) {
-//            DaftarKataScreen()
-//        }
     }
 }
