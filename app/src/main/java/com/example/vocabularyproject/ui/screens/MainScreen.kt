@@ -1,11 +1,9 @@
-package com.example.vocabularyproject.screens
+package com.example.vocabularyproject.ui.screens
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.vocabularyproject.navigations.Home
-import com.example.vocabularyproject.navigations.InputKata
 import com.example.vocabularyproject.navigations.Screen
 
 @Composable
@@ -36,7 +34,11 @@ fun MainScreen() {
             )
         }
         composable(Screen.DaftarKata.route) {
-            DaftarKataScreen()
+            DaftarKataScreen(
+                onNavigateToInput = {
+                    navController.navigate(Screen.InputKata.route)
+                }
+            )
         }
 
     }

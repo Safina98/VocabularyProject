@@ -3,8 +3,6 @@ package com.example.vocabularyproject.ui.widgetstyles
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -16,20 +14,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 
 
 
 @Composable
-fun WordListCard(eWord: String, defition: String, translations: List<String>, onClick: () -> Unit) {
+fun WordListCard(eWord: String,
+                 defition: String,
+                 translations: List<String>,
+                 onEWordClick: () -> Unit,
+                 onEDefinitionClick: () -> Unit,
+                 onIWordsClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
-            .clickable { onClick() },
+            .padding(8.dp),
+
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(12.dp)
         // Note: Card uses 'colors = CardDefaults.cardColors(...)' for background normally
@@ -51,11 +52,13 @@ fun WordListCard(eWord: String, defition: String, translations: List<String>, on
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
+                    modifier = Modifier.clickable { onEWordClick() },
                     text = "$eWord :",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
+                    modifier = Modifier.clickable { onEDefinitionClick() },
                     text = defition,
                     style = MaterialTheme.typography.bodyLarge,
                     // If the definition is long, it will wrap automatically here
@@ -64,9 +67,10 @@ fun WordListCard(eWord: String, defition: String, translations: List<String>, on
 
             // Translations section
             FlowRow(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().clickable { onIWordsClick() },
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
+
             ) {
                 translations.forEach { indo ->
                     Text(
@@ -80,9 +84,9 @@ fun WordListCard(eWord: String, defition: String, translations: List<String>, on
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ContactCardPreview(){
-    WordListCard("Jane Doe","Unknown Woman\n unidentified women\n common unimportan woman",listOf("Ri rima","Tidak di kenal"),{})
-
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun ContactCardPreview(){
+//    WordListCard("Jane Doe","Unknown Woman\n unidentified women\n common unimportan woman",listOf("Ri rima","Tidak di kenal"),{})
+//
+//}

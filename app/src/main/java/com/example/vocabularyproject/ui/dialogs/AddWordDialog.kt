@@ -11,10 +11,14 @@ import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun AddWordDialog(
+    id: Long?,
+    initialWord: String?,
     onDismiss: () -> Unit,
-    onAddClick: (String) -> Unit
+    onAddClick: (Long?, String) -> Unit
 ) {
-    var dialogText by remember { mutableStateOf("") }
+    var dialogText by remember(initialWord) {
+        mutableStateOf(initialWord.orEmpty())
+    }
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -27,7 +31,7 @@ fun AddWordDialog(
                     .widthIn(min = 280.dp)
             ) {
                 Text(
-                    text = "Add word",
+                    text = if (id == null) "Add word" else "Edit word",
                     style = MaterialTheme.typography.titleMedium
                 )
 
@@ -55,11 +59,11 @@ fun AddWordDialog(
                     Button(
                         onClick = {
                             if (dialogText.isNotBlank()) {
-                                onAddClick(dialogText)
+                                onAddClick(id, dialogText)
                             }
                         }
                     ) {
-                        Text("Add")
+                        Text(if (id == null) "Add" else "Save")
                     }
                 }
             }
@@ -71,8 +75,9 @@ fun AddWordDialog(
 @Composable
 fun AddWordDialogPreview() {
     AddWordDialog(
+        null,null,
         onDismiss = {},
-        onAddClick = {}
+        onAddClick = {_,word -> }
     )
 }
 

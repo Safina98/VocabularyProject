@@ -18,6 +18,27 @@ interface EnglishWordsDao {
     @Update
     fun update(englishWord: EnglishWordsTable)
 
+    @Query("""
+        UPDATE english_words 
+        SET eWord = :newWord 
+        WHERE eId = :id
+    """)
+    suspend fun updateEWordById(
+        id: Long,
+        newWord: String
+    )
+    @Query(
+        """
+        UPDATE english_words 
+        SET definition = :newdefinition 
+        WHERE eId = :id
+    """
+    )
+    suspend fun updateDefinitionById(
+        id: Long,
+        newdefinition: String
+    )
+
     @Query("DELETE FROM english_words WHERE eId = :id")
     fun delete(id: Long)
 

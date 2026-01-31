@@ -30,6 +30,17 @@ class VocabularyRepository @Inject constructor(
          englishWordsDao.update(englishWord)
         }
      }
+    suspend fun updateEWordById(id: Long, newWord: String) {
+        withContext(Dispatchers.IO){
+            englishWordsDao.updateEWordById(id, newWord)
+        }
+    }
+    suspend fun updateDefinitionById(id: Long, definition: String) {
+        withContext(Dispatchers.IO){
+            englishWordsDao.updateDefinitionById(id, definition)
+        }
+    }
+
     fun getAllEnglishWords(): Flow<List<EnglishWordsTable>> =
         englishWordsDao.getEnglishWords()
     fun getWordTranslationList(): Flow<List<WordTranslationModel>> =
@@ -43,9 +54,9 @@ class VocabularyRepository @Inject constructor(
             indonesianWordsDao.insert(indonesianWord)
         }
     }
-    suspend fun updateIndonesianWord(indonesianWord: IndonesianWordsTable) {
+    suspend fun updateIWord(iId:Long,iWord:String) {
         withContext(Dispatchers.IO){
-            indonesianWordsDao.update(indonesianWord)
+            indonesianWordsDao.updateIWordById(iId,iWord)
         }
     }
     fun getAllIndonesianWords():Flow<List<IndonesianWordsTable>> =

@@ -1,4 +1,4 @@
-package com.example.vocabularyproject.screens
+package com.example.vocabularyproject.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement

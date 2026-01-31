@@ -1,4 +1,4 @@
-package com.example.vocabularyproject.screens
+package com.example.vocabularyproject.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -98,8 +98,9 @@ fun InputKataScreen(
 
         if (showDialog) {
             AddWordDialog(
+                null,null,
                 onDismiss = { showDialog = false },
-                onAddClick = { word ->
+                onAddClick = { _,word ->
                     iWViewModel.addWord(word)
                     //Log.i("InputKataScreen", "Added word: $word")
                     showDialog = false
@@ -110,8 +111,8 @@ fun InputKataScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun InputKataScreenPreview() {
-    InputKataScreen(hiltViewModel(),{})
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun InputKataScreenPreview() {
+//    InputKataScreen(hiltViewModel(),{})
+//}

@@ -63,6 +63,24 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
         Log.i("InputKataScreen","VM  Add Word ${iWordsListM.value}")
     }
 
+    fun updateEWord(eId:Long, eWord:String){
+        viewModelScope.launch {
+            repository.updateEWordById(eId,eWord)
+        }
+    }
+    fun updateDefinition(id:Long, definition:String){
+        viewModelScope.launch {
+            repository.updateDefinitionById(id,definition)
+        }
+    }
+    fun updateIWord(iId:Long, iWord:String){
+        viewModelScope.launch {
+            Log.i("DaftarKataScreen","View Model $iId $iWord")
+            repository.updateIWord(iId,iWord)
+        }
+    }
+
+
     fun saveWord() {
         viewModelScope.launch {
             Log.i("InputKataScreen","VM SaveWord called")
@@ -106,6 +124,11 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
         iWordsListM.value= emptyList()
         eWordM.value=""
         definitionM.value=""
+    }
+    fun setValues(eWord:String,defitinion:String,iWords:List<String>){
+        eWordM.value=eWord
+        definitionM.value=defitinion
+        iWordsListM.value=iWords
     }
 
     val filteredWords = combine(wtModelList, _searchQuery) { words, query ->

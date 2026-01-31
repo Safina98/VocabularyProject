@@ -16,6 +16,15 @@ interface IndonesianWordsDao {
     @Update
     fun update(indonesianWord: IndonesianWordsTable)
 
+    @Query("""
+        UPDATE indonesian_words
+        SET iWord = :newWord 
+        WHERE iId = :id
+    """)
+    suspend fun updateIWordById(
+        id: Long,
+        newWord: String
+    )
     @Query("DELETE FROM indonesian_words WHERE iId = :id")
     fun delete(id:Long)
 
