@@ -35,11 +35,14 @@ fun DaftarKataScreen(
     iWViewModel: InputWordViewModel = hiltViewModel()
 )
 {
+
+    val translations by iWViewModel.translationsM.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
     var showListDialog by remember { mutableStateOf(false) }
-    var selectedEId by remember { mutableStateOf<Long?>(null) }
+
     var selectedITables by remember { mutableStateOf<List<IndonesianWordsTable>?>(null) }
     var selectedWord by remember { mutableStateOf("") }
+    var selectedEId by remember { mutableStateOf(0L) }
     var editField by remember { mutableStateOf<EditField?>(null) }
 
 
@@ -110,28 +113,38 @@ fun DaftarKataScreen(
                     defition = wordItem.english.definition,
                     translations = wordItem.indonesianWords.map { it.iWord },
                     onEWordClick = {
+                        iWViewModel.setCurrentId(wordItem.english.eId)
                         selectedEId = wordItem.english.eId
                         selectedWord = wordItem.english.eWord
                         editField = EditField.E_WORD
                         showDialog = true
-                    }, onEDefinitionClick = {
+                    },
+                    onEDefinitionClick = {
+                        iWViewModel.setCurrentId(wordItem.english.eId)
                         selectedEId = wordItem.english.eId
                         selectedWord = wordItem.english.definition
                         editField = EditField.DEFINITION
                         showDialog = true
-                    }, onIWordsClick = {
+                    },
+                    onIWordsClick = {
+                        iWViewModel.setCurrentId(wordItem.english.eId)
                         selectedITables=wordItem.indonesianWords
+                        showListDialog=true
+                    },
+                    onDeleteClick = {
+                        iWViewModel.deleteEWord(wordItem.english.eId)
+                        iWViewModel.deleteIWords(wordItem.indonesianWords)
                     }
                 )
             }
         }
         if (showDialog) {
             AddWordDialog(
-                id = selectedEId,
+                id = selectedEId ,
                 initialWord = selectedWord,
                 onDismiss = { showDialog = false },
                 onAddClick = { id,word ->
-                    Log.i("DaftarKataScreen","$id $word")
+                    Log.i("DAFTARKATASCREEN","Show dialog id: $id")
                     if (editField==EditField.E_WORD)   iWViewModel.updateEWord(id!!,word)
                     else if (editField==EditField.DEFINITION) iWViewModel.updateDefinition(id!!,word)
                     else if (editField==EditField.I_WORDS) {
@@ -144,18 +157,23 @@ fun DaftarKataScreen(
         }
         if (showListDialog) {
             ListDialog(
-                translations = selectedITables.orEmpty(),
+                translations = translations,
                 onDismiss = { showListDialog = false },
                 onWordClick = { item->
-                    Log.i("DaftarKataScreen","$item")
                     selectedWord=item.iWord
-                    selectedEId=item.iId
+                    selectedEId = item.iId
                     editField= EditField.I_WORDS
                     showDialog=true
-                  showListDialog = false
+                },
+                onDelete = {item->
+                    iWViewModel.deleteIWord(item.iId)
+                },{
+                    editField= EditField.I_WORDS
+                    selectedEId=0L
+                    Log.i("DAFTARKATASCREEN","Set SelectedEId to: $selectedEId")
+                    showDialog=true
                 }
             )
-
         }
     }
 }

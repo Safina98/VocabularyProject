@@ -1,12 +1,18 @@
 package com.example.vocabularyproject.ui.dialogs
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
@@ -23,13 +29,21 @@ import com.example.vocabularyproject.database.tables.IndonesianWordsTable
 fun ListDialog(
     translations: List<IndonesianWordsTable>,
     onDismiss: () -> Unit,
-    onWordClick: (IndonesianWordsTable) -> Unit
+    onWordClick: (IndonesianWordsTable) -> Unit,
+    onDelete:(IndonesianWordsTable)->Unit,
+    onAdd:()->Unit,
+
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        confirmButton = {
+        dismissButton = {
             TextButton(onClick = onDismiss) {
                 Text("Close")
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onAdd) {
+                Text("Add")
             }
         },
         title = {
@@ -53,10 +67,23 @@ fun ListDialog(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     translations.forEach { item ->
-                        SuggestionChip(
+                        InputChip(
+                            selected = false, // Or manage state if needed
                             onClick = { onWordClick(item) },
                             label = { Text(item.iWord) },
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(8.dp),
+                            trailingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Delete",
+                                    modifier = Modifier
+                                        .size(18.dp)
+                                        .clickable {
+                                            onDelete(item)
+                                        },
+                                    tint = Color.Gray
+                                )
+                            }
                         )
                     }
                 }
@@ -81,6 +108,11 @@ fun ListDialogPreview() {
             onDismiss = { /* Do nothing in preview */ },
             onWordClick = { selectedWord ->
                 println("Clicked on: ${selectedWord.iWord}")
+            },
+            onDelete = {
+                println("Deleted: ${it.iWord}")
+            },{
+
             }
         )
     }

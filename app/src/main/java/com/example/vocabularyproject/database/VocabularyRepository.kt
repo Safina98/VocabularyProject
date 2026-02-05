@@ -25,11 +25,11 @@ class VocabularyRepository @Inject constructor(
         }
     }
 
-    suspend fun updateEnglishWord(englishWord: EnglishWordsTable) {
-     withContext(Dispatchers.IO){
-         englishWordsDao.update(englishWord)
+    suspend fun deleteEnglishWord(id:Long){
+        withContext(Dispatchers.IO){
+            englishWordsDao.delete(id)
         }
-     }
+    }
     suspend fun updateEWordById(id: Long, newWord: String) {
         withContext(Dispatchers.IO){
             englishWordsDao.updateEWordById(id, newWord)
@@ -50,10 +50,15 @@ class VocabularyRepository @Inject constructor(
     //////////////////////////////////////////////////////////////////////////////////
     suspend fun insertIndonesianWord(indonesianWord: IndonesianWordsTable) {
         withContext(Dispatchers.IO){
-            Log.i("InputKataScreen","Repo insert called")
             indonesianWordsDao.insert(indonesianWord)
         }
     }
+    suspend fun deleteIndonesianWord(id:Long){
+        withContext(Dispatchers.IO) {
+            indonesianWordsDao.delete(id)
+        }
+    }
+
     suspend fun updateIWord(iId:Long,iWord:String) {
         withContext(Dispatchers.IO){
             indonesianWordsDao.updateIWordById(iId,iWord)
@@ -62,16 +67,16 @@ class VocabularyRepository @Inject constructor(
     fun getAllIndonesianWords():Flow<List<IndonesianWordsTable>> =
         indonesianWordsDao.selectIndonesianWords()
 
-    ////////////////////////////////////////////////////////////////////////////////
+    fun getCorelatedIndonesianWords(eId:Long):Flow<List<IndonesianWordsTable>> =
+        indonesianWordsDao.selectCorelatedIndonesanWords(eId)
 
+    ////////////////////////////////////////////////////////////////////////////////
     suspend fun insertCorrelatedWord(correlatedWord: CorrelatedWord){
         withContext(Dispatchers.IO){
             Log.i("InputKataScreen","Repo insert called")
             correlatedWordsDao.insert(correlatedWord)
         }
     }
-
     fun getAllCorrelatedId(): Flow<List<CorrelatedWord>> =
         correlatedWordsDao.selectAllCorrelatedIds()
-
 }

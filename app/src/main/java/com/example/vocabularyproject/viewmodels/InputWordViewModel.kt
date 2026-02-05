@@ -8,14 +8,19 @@ import com.example.vocabularyproject.database.tables.CorrelatedWord
 import com.example.vocabularyproject.database.tables.EnglishWordsTable
 import com.example.vocabularyproject.database.tables.IndonesianWordsTable
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,13 +34,6 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
 
-    val englishWords: StateFlow<List<EnglishWordsTable>> =
-        repository.getAllEnglishWords()
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = emptyList()
-            )
     val wtModelList =
         repository.getWordTranslationList()
             .stateIn(
@@ -43,24 +41,28 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = emptyList()
             )
-    val indonesianWords: StateFlow<List<IndonesianWordsTable>> =
-        repository.getAllIndonesianWords()
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = emptyList()
-            )
-    val correlatedId: StateFlow<List<CorrelatedWord>> =
-        repository.getAllCorrelatedId()
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = emptyList()
-            )
+
+
+   val currentId = MutableStateFlow<Long?>(null)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val translationsM: StateFlow<List<IndonesianWordsTable>> = currentId
+        .flatMapLatest { id ->
+            if (id == null) flowOf(emptyList())
+            else repository.getCorelatedIndonesianWords(id)
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    fun setCurrentId(eId: Long) {
+        currentId.value = eId
+    }
 
     fun addWord(word:String) {
         iWordsListM.value=iWordsListM.value+word
-        Log.i("InputKataScreen","VM  Add Word ${iWordsListM.value}")
     }
 
     fun updateEWord(eId:Long, eWord:String){
@@ -75,45 +77,63 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
     }
     fun updateIWord(iId:Long, iWord:String){
         viewModelScope.launch {
-            Log.i("DaftarKataScreen","View Model $iId $iWord")
-            repository.updateIWord(iId,iWord)
+            Log.i("DAFTARKATASCREEN","Parameter id in viewModel is: $iId")
+            if (iId!=0L){
+                repository.updateIWord(iId,iWord)
+            }
+            else{
+                val iWord=IndonesianWordsTable(iId= System.currentTimeMillis(),iWord = iWord)
+                Log.i("DAFTARKATASCREEN","New assigned id si: ${iWord.iId}")
+                val cWord=CorrelatedWord(eId = currentId.value!!,iId = iWord.iId)
+                repository.insertIndonesianWord(iWord)
+                repository.insertCorrelatedWord(cWord)
+            }
         }
     }
 
-
+    fun deleteEWord(eId:Long){
+        viewModelScope.launch {
+            repository.deleteEnglishWord(eId)
+        }
+    }
+    fun deleteIWord(iId:Long){
+        viewModelScope.launch {
+            repository.deleteIndonesianWord(iId)
+        }
+    }
+    fun deleteIWords(iWords:List<IndonesianWordsTable>){
+        viewModelScope.launch {
+            deleteIndonesianWordList(iWords)
+        }
+    }
+    private suspend fun deleteIndonesianWordList(iWords:List<IndonesianWordsTable>){
+        withContext(Dispatchers.IO){
+            iWords.forEach {
+                repository.deleteIndonesianWord(it.iId)
+            }
+        }
+    }
     fun saveWord() {
         viewModelScope.launch {
-            Log.i("InputKataScreen","VM SaveWord called")
-
             val eId = System.currentTimeMillis()
-
             val eWTable = EnglishWordsTable(
                 eId = eId,
                 eWord = eWordM.value,
                 definition = definitionM.value
             )
-
             repository.insertEnglishWord(eWTable)
-            Log.i("InputKataScreen","VM ${iWordsListM.value}")
             iWordsListM.value.forEach { word ->
-
                 val iId = System.currentTimeMillis()
-
                 val iWTable = IndonesianWordsTable(
                     iId = iId,
                     iWord = word
                 )
-                Log.i("InputKataScreen","VM ${iWTable.iId} ${iWTable.iWord}")
-
                 repository.insertIndonesianWord(iWTable)
-
                 val crTable = CorrelatedWord(
                     eId = eId,
                     iId = iId
                 )
-
                 repository.insertCorrelatedWord(crTable)
-
                 delay(1) // still ok if you want unique timestamps
             }
             resetValues()

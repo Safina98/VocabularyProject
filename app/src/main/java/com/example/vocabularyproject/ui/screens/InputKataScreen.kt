@@ -38,19 +38,6 @@ fun InputKataScreen(
     val eWord by iWViewModel.eWordM.collectAsState()
     val definition by iWViewModel.definitionM.collectAsState()
 
-    val englishWords by iWViewModel.englishWords.collectAsState()
-    val iWords by iWViewModel.indonesianWords.collectAsState()
-    val cIds by iWViewModel.correlatedId.collectAsState()
-
-    englishWords.forEach{
-        Log.i("InputKataScreen", "id: ${it.eId} Word: ${it.eWord} def: ${it.definition}")
-    }
-    iWords.forEach {
-        Log.i("InputKataScreen", "id: ${it.iId} Word: ${it.iWord}")
-    }
-    cIds.forEach {
-        Log.i("InputKataScreen", "id: ${it.cId} eId: ${it.eId} iId: ${it.iId}")
-    }
 
     Column(
         modifier = Modifier.fillMaxSize(),

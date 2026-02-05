@@ -30,4 +30,12 @@ interface IndonesianWordsDao {
 
     @Query("SELECT * FROM indonesian_words")
     fun selectIndonesianWords(): Flow<List<IndonesianWordsTable>>
+
+    @Query("""
+        SELECT i.* FROM indonesian_words i
+        INNER JOIN correlated_words c ON i.iId = c.iId
+        WHERE c.eId =:eId
+    """)
+    fun selectCorelatedIndonesanWords(eId:Long):Flow<List<IndonesianWordsTable>>
+
 }

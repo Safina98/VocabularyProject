@@ -35,9 +35,7 @@ fun MainScreen() {
         }
         composable(Screen.DaftarKata.route) {
             DaftarKataScreen(
-                onNavigateToInput = {
-                    navController.navigate(Screen.InputKata.route)
-                }
+
             )
         }
 
