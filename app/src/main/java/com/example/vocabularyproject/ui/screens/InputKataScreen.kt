@@ -25,6 +25,7 @@ import com.example.vocabularyproject.ui.widgetstyles.HomeScreenButtonStyles
 import com.example.vocabularyproject.viewmodels.InputWordViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.vocabularyproject.ui.widgetstyles.TransparentButton
+import com.example.vocabularyproject.util.buttonGradientClolor
 
 
 @Composable
@@ -75,7 +76,7 @@ fun InputKataScreen(
 
             },
             modifier = Modifier.fillMaxWidth(),
-            gradientColors = listOf(Color(0xFF1C0838),Color(0xFF1A7067), Color(0xFF4C6461))
+            gradientColors = buttonGradientClolor
         )
         TransparentButton(
             "Lihat Daftar Kata",

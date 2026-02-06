@@ -22,6 +22,9 @@ fun MainScreen() {
                 },
                 onDaftarKataClick = {
                     navController.navigate(Screen.DaftarKata.route)
+                },
+                onPermainanClick = {
+                    navController.navigate(Screen.Permainan.route)
                 }
             )
         }
@@ -38,6 +41,10 @@ fun MainScreen() {
 
             )
         }
+        composable (Screen.Permainan.route){
+            PermainanScreen()
+        }
+        // Add more composables for other screens if needed)
 
     }
 }

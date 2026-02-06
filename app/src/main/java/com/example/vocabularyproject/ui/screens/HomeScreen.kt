@@ -12,11 +12,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.vocabularyproject.ui.widgetstyles.HomeScreenButtonStyles
 import com.example.vocabularyproject.ui.theme.VocabularyProjectTheme
+import com.example.vocabularyproject.util.buttonGradientClolor
 
 @Composable
 fun HomeScreen(
     onInputKataClick: () -> Unit,
     onDaftarKataClick: () -> Unit,
+    onPermainanClick:()->Unit
     ){
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -26,21 +28,18 @@ fun HomeScreen(
         HomeScreenButtonStyles("Input Kata",
             onClick  = onInputKataClick,
             modifier = Modifier.fillMaxWidth(),
-            gradientColors = listOf(Color(0xFF1C0838),Color(0xFF1A7067), Color(0xFF4C6461))
+            gradientColors = buttonGradientClolor
         )
 
         HomeScreenButtonStyles("Mulai Permainana",
-            onClick = {
-                //Navigate to TebakKataScreen
-                Log.i("HomeScreen","Mulai Permainan Cliked")
-                      },
+            onClick =onPermainanClick,
             modifier = Modifier.fillMaxWidth(),
-            gradientColors = listOf(Color(0xFF1C0838),Color(0xFF1A7067), Color(0xFF4C6461))
+            gradientColors = buttonGradientClolor
         )
         HomeScreenButtonStyles("Lihat Daftar Kata",
             onClick = onDaftarKataClick,
             modifier = Modifier.fillMaxWidth(),
-            gradientColors = listOf(Color(0xFF1C0838),Color(0xFF1A7067), Color(0xFF4C6461))
+            gradientColors = buttonGradientClolor
         )
 
     }
@@ -52,6 +51,6 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     // Wrap it in your App Theme so it looks correct
     VocabularyProjectTheme() {
-        HomeScreen({},{})
+        HomeScreen({},{},{})
     }
 }

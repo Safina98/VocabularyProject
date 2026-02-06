@@ -11,7 +11,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,8 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-
-
+import com.example.vocabularyproject.util.cardGradientColors
 
 
 @Composable
@@ -42,17 +40,17 @@ fun WordListCard(eWord: String,
         shape = RoundedCornerShape(12.dp)
         // Note: Card uses 'colors = CardDefaults.cardColors(...)' for background normally
     ) {
-        val gradientColors = listOf(Color(0xFFB2DFDB), Color(0xFFF8BBD0), Color(0xFFFFCDD2))
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(brush = Brush.horizontalGradient(colors = gradientColors))
+                .background(brush = Brush.horizontalGradient(colors = cardGradientColors))
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     // Apply the gradient here to cover the whole internal area
-                    .background(brush = Brush.horizontalGradient(colors = gradientColors))
+                    .background(brush = Brush.horizontalGradient(colors = cardGradientColors))
                     .padding(12.dp), // Add padding so text doesn't touch the edges
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.Start
