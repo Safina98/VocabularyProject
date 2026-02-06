@@ -62,7 +62,7 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
     }
 
     fun addWord(word:String) {
-        iWordsListM.value=iWordsListM.value+word
+        iWordsListM.value=iWordsListM.value+word.trim().uppercase()
     }
 
     fun updateEWord(eId:Long, eWord:String){
@@ -115,27 +115,29 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
     }
     fun saveWord() {
         viewModelScope.launch {
-            val eId = System.currentTimeMillis()
-            val eWTable = EnglishWordsTable(
-                eId = eId,
-                eWord = eWordM.value,
-                definition = definitionM.value
-            )
-            repository.insertEnglishWord(eWTable)
-            iWordsListM.value.forEach { word ->
-                val iId = System.currentTimeMillis()
-                val iWTable = IndonesianWordsTable(
-                    iId = iId,
-                    iWord = word
-                )
-                repository.insertIndonesianWord(iWTable)
-                val crTable = CorrelatedWord(
-                    eId = eId,
-                    iId = iId
-                )
-                repository.insertCorrelatedWord(crTable)
-                delay(1) // still ok if you want unique timestamps
-            }
+            repository.saveFullWordEntry(eWordM.value.trim().uppercase(),definitionM.value.trim().uppercase(),iWordsListM.value)
+
+//            val eId = System.currentTimeMillis()
+//            val eWTable = EnglishWordsTable(
+//                eId = eId,
+//                eWord = eWordM.value,
+//                definition = definitionM.value
+//            )
+//            repository.insertEnglishWord(eWTable)
+//            iWordsListM.value.forEach { word ->
+//                val iId = System.currentTimeMillis()
+//                val iWTable = IndonesianWordsTable(
+//                    iId = iId,
+//                    iWord = word
+//                )
+//                repository.insertIndonesianWord(iWTable)
+//                val crTable = CorrelatedWord(
+//                    eId = eId,
+//                    iId = iId
+//                )
+//                repository.insertCorrelatedWord(crTable)
+//                delay(1) // still ok if you want unique timestamps
+//            }
             resetValues()
         }
     }

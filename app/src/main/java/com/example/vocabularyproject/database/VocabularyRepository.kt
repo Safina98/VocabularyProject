@@ -19,6 +19,12 @@ class VocabularyRepository @Inject constructor(
     private val correlatedWordsDao: CorrelatedWordsDao
     ){
 
+    suspend fun saveFullWordEntry(eWord: String, definition: String, iWords: List<String>) {
+        withContext(Dispatchers.IO) {
+            correlatedWordsDao.saveFullWordEntry(eWord, definition, iWords)
+        }
+    }
+
     suspend fun insertEnglishWord(englishWord: EnglishWordsTable) {
         withContext(Dispatchers.IO){
             englishWordsDao.insert(englishWord)

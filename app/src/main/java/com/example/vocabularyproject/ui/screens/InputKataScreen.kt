@@ -89,7 +89,6 @@ fun InputKataScreen(
                 onDismiss = { showDialog = false },
                 onAddClick = { _,word ->
                     iWViewModel.addWord(word)
-                    //Log.i("InputKataScreen", "Added word: $word")
                     showDialog = false
                 }
             )

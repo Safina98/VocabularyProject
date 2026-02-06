@@ -39,12 +39,9 @@ fun DaftarKataScreen(
     val translations by iWViewModel.translationsM.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
     var showListDialog by remember { mutableStateOf(false) }
-
-    var selectedITables by remember { mutableStateOf<List<IndonesianWordsTable>?>(null) }
     var selectedWord by remember { mutableStateOf("") }
     var selectedEId by remember { mutableStateOf(0L) }
     var editField by remember { mutableStateOf<EditField?>(null) }
-
 
     val filteredWords by iWViewModel.filteredWords.collectAsState()
     val searchQuery by iWViewModel.searchQuery.collectAsState()
@@ -53,7 +50,6 @@ fun DaftarKataScreen(
     var isSearchActive by remember { mutableStateOf(false) }
 
     // Filter the list based on query
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -128,7 +124,6 @@ fun DaftarKataScreen(
                     },
                     onIWordsClick = {
                         iWViewModel.setCurrentId(wordItem.english.eId)
-                        selectedITables=wordItem.indonesianWords
                         showListDialog=true
                     },
                     onDeleteClick = {
