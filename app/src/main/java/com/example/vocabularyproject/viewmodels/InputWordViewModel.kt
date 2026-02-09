@@ -4,13 +4,12 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vocabularyproject.database.VocabularyRepository
+import com.example.vocabularyproject.database.models.WordTranslationModel
 import com.example.vocabularyproject.database.tables.CorrelatedWord
-import com.example.vocabularyproject.database.tables.EnglishWordsTable
 import com.example.vocabularyproject.database.tables.IndonesianWordsTable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -34,6 +34,7 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
 
+
     val wtModelList =
         repository.getWordTranslationList()
             .stateIn(
@@ -42,6 +43,40 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
                 initialValue = emptyList()
             )
 
+    val randomizedWtList = wtModelList.map { list ->
+        list.shuffled()
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = emptyList()
+    )
+    private val cardIndexM = MutableStateFlow(0)
+    val cardIndex: StateFlow<Int> = cardIndexM.asStateFlow()
+
+    private val isRevealedM = MutableStateFlow(false)
+    val isRevealed: StateFlow<Boolean> = isRevealedM.asStateFlow()
+
+    // 2. The Current Item (derived from the list and the index)
+    val currentItem: StateFlow<WordTranslationModel?> = combine(
+        randomizedWtList,
+        cardIndexM
+    ) { list, index ->
+        list.getOrNull(index)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = null
+    )
+    val answerText: StateFlow<String> = currentItem.map { item ->
+        item?.indonesianWords?.joinToString(", ") { it.iWord } ?: ""
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = ""
+    )
+    private val isAnswerCorrectM=MutableStateFlow(false)
+    val isAnswerCorrect: StateFlow<Boolean> = isAnswerCorrectM.asStateFlow()
+    val answer = MutableStateFlow("")
 
    val currentId = MutableStateFlow<Long?>(null)
 
@@ -61,6 +96,33 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
         currentId.value = eId
     }
 
+    fun toggleReveal() {
+        isRevealedM.value = true
+    }
+    fun nextCard() {
+        // You can add logic here to stop at the end or loop
+        cardIndexM.value++
+        isRevealedM.value=false
+        answer.value=""
+        isAnswerCorrectM.value=false
+    }
+    fun checkAnswer(){
+       currentItem.value?.indonesianWords?.forEach {
+           if (answer.value.trim().uppercase()==it.iWord){
+               isAnswerCorrectM.value=true
+           }
+       }
+        if (isAnswerCorrectM.value){
+            Log.i("PermainanScreen","Your answer is correct")
+        }else{
+            Log.i("PermainanScreen","Your answer is incorrect")
+            Log.i("PermainanScreen","The answers are:")
+            currentItem.value?.indonesianWords?.forEach {
+                Log.i("PermainanScreen","${it.iWord}")
+            }
+            Log.i("PermainanScreen","Your Answer : ${answer.value}")
+        }
+    }
     fun addWord(word:String) {
         iWordsListM.value=iWordsListM.value+word.trim().uppercase()
     }

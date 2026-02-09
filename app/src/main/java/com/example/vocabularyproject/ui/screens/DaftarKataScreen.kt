@@ -24,9 +24,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import com.example.vocabularyproject.database.models.WordTranslationModel
 import com.example.vocabularyproject.database.tables.IndonesianWordsTable
 import com.example.vocabularyproject.ui.dialogs.AddWordDialog
 import com.example.vocabularyproject.ui.dialogs.ListDialog
+import com.example.vocabularyproject.ui.theme.amarath
+import com.example.vocabularyproject.ui.theme.pomeloOlive
 import com.example.vocabularyproject.util.EditField
 
 @OptIn(ExperimentalMaterial3Api::class) // Needed for TopAppBar
@@ -51,6 +54,7 @@ fun DaftarKataScreen(
 
     // Filter the list based on query
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
                 title = {
@@ -88,33 +92,55 @@ fun DaftarKataScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    // Change the color of the text and icons here
+                    containerColor = amarath,
+                    titleContentColor = Color.White
                 )
+
             )
         }
     ) { innerPadding -> // This innerPadding is crucial!
 
         // Use LazyColumn instead of Column + forEach for better performance
+        // 5. Wrap your lambdas in remember to prevent them from being recreated on every scroll
+        val onEWordClickRemembered = remember(selectedEId) {
+            { wordItem: WordTranslationModel ->
+                iWViewModel.setCurrentId(wordItem.english.eId)
+                selectedEId = wordItem.english.eId
+                selectedWord = wordItem.english.eWord
+                editField = EditField.E_WORD
+                showDialog = true
+            }
+        }
+
+// ... Repeat for other clicks or use a single event handler
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding), // Prevents toolbar from overlapping content
+                .padding(innerPadding),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ) {
-            items(filteredWords) { wordItem ->
+            items(
+                items = filteredWords,
+                key = { it.english.eId },
+                contentType = { "word_translation_model" }
+            ) { wordItem ->
+
+
+                // 3. Stability: Move the .map out of the parameter if possible,
+                // but since we aren't changing the list type, we use remember to
+                // ensure the mapping only happens if the wordItem actually changes.
+                val translations = remember(wordItem) {
+                    wordItem.indonesianWords.map { it.iWord }
+                }
+
                 WordListCard(
                     eWord = wordItem.english.eWord,
                     defition = wordItem.english.definition,
-                    translations = wordItem.indonesianWords.map { it.iWord },
-                    onEWordClick = {
-                        iWViewModel.setCurrentId(wordItem.english.eId)
-                        selectedEId = wordItem.english.eId
-                        selectedWord = wordItem.english.eWord
-                        editField = EditField.E_WORD
-                        showDialog = true
-                    },
+                    translations = translations,
+                    onEWordClick = { onEWordClickRemembered(wordItem) },
                     onEDefinitionClick = {
                         iWViewModel.setCurrentId(wordItem.english.eId)
                         selectedEId = wordItem.english.eId
@@ -124,7 +150,7 @@ fun DaftarKataScreen(
                     },
                     onIWordsClick = {
                         iWViewModel.setCurrentId(wordItem.english.eId)
-                        showListDialog=true
+                        showListDialog = true
                     },
                     onDeleteClick = {
                         iWViewModel.deleteEWord(wordItem.english.eId)

@@ -70,6 +70,9 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler) // Using KSP instead of kapt
 
+    implementation(libs.airbnb.lottie.compose)
+    //implementation("com.github.LottieFiles:dotlottie-android:0.0.3")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

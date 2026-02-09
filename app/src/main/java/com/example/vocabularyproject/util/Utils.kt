@@ -1,11 +1,19 @@
 package com.example.vocabularyproject.util
 
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.example.vocabularyproject.ui.theme.ThulianPink
+import com.example.vocabularyproject.ui.theme.amarath
+import com.example.vocabularyproject.ui.theme.brookGreen
+import com.example.vocabularyproject.ui.theme.brookGreenLight
+import com.example.vocabularyproject.ui.theme.chalk
 
 enum class EditField {
     E_WORD,
     DEFINITION,
     I_WORDS
 }
-val cardGradientColors = listOf(Color(0xFFB2DFDB), Color(0xFFF8BBD0), Color(0xFFFFCDD2))
-val buttonGradientClolor=listOf(Color(0xFF1C0838),Color(0xFF1A7067), Color(0xFF4C6461))
+
+val cardGradientColors = listOf(brookGreen, brookGreenLight, brookGreen)
+val cardGradientBrush = Brush.horizontalGradient(colors = cardGradientColors)
+val buttonGradientClolor = listOf(amarath, amarath, amarath)
