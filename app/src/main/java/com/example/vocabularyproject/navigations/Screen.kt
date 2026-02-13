@@ -6,4 +6,5 @@ sealed class Screen(val route: String) {
 
     object DaftarKata : Screen("daftar_kata")
     object Permainan:Screen("permainan")
+    object Setting:Screen("setting")
 }

@@ -21,7 +21,7 @@ object DatabaseModule {
         context,
         VocabularyDatabase::class.java,
         "vocabulary.db"
-    ).fallbackToDestructiveMigration(true)
+    )
         .build()
     @Provides
     fun provideEnglishWordsDao(db: VocabularyDatabase)=db.englishWordsDao()

@@ -1,5 +1,6 @@
 package com.example.vocabularyproject.ui.widgetstyles
 
+import EWordListener
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -21,14 +23,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.vocabularyproject.database.models.WordTranslationModel
+import com.example.vocabularyproject.database.tables.EnglishWordsTable
+import com.example.vocabularyproject.database.tables.IndonesianWordsTable
 import com.example.vocabularyproject.util.cardGradientColors
 
+@OptIn(ExperimentalLayoutApi::class)
 
 @Composable
-fun WordListCard(eWord: String,
-                 defition: String,
-                 translations: List<String>,
-                 onEWordClick: () -> Unit,
+fun WordListCard(wordTransa: WordTranslationModel, index: Int,
+                 onEWordClick: EWordListener,
                  onEDefinitionClick: () -> Unit,
                  onIWordsClick: () -> Unit,
                  onDeleteClick: () -> Unit) {
@@ -51,25 +55,25 @@ fun WordListCard(eWord: String,
                 modifier = Modifier
                     .fillMaxWidth()
                     // Apply the gradient here to cover the whole internal area
-                    .background(brush = Brush.horizontalGradient(colors = cardGradientColors))
                     .padding(12.dp), // Add padding so text doesn't touch the edges
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.Start
             ) {
                 // Header: Word and Definition
+                Text(
+                    modifier = Modifier.clickable { onEWordClick.onPlusButtonClick(wordTransa) },
+                    text = "${wordTransa.english.eWord} :",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
                 FlowRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        modifier = Modifier.clickable { onEWordClick() },
-                        text = "$eWord :",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
+
                     Text(
                         modifier = Modifier.clickable { onEDefinitionClick() },
-                        text = defition.lowercase(),
+                        text = "${wordTransa.english.definition.lowercase()} :",
                         style = MaterialTheme.typography.bodySmall,
                         // If the definition is long, it will wrap automatically here
                     )
@@ -77,14 +81,16 @@ fun WordListCard(eWord: String,
 
                 // Translations section
                 FlowRow(
-                    modifier = Modifier.fillMaxWidth().clickable { onIWordsClick() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onIWordsClick() },
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
 
                 ) {
-                    translations.forEach { indo ->
+                    wordTransa.indonesianWords.forEach { indo ->
                         Text(
-                            text = "• $indo",
+                            text = "• ${indo.iWord}",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.DarkGray
                         )
@@ -113,13 +119,15 @@ fun WordListCard(eWord: String,
 @Preview(showBackground = true)
 @Composable
 fun ContactCardPreview(){
-    WordListCard(
-        "Jane Doe",
-        "Unknown Woman\n unidentified women\n common unimportan woman",
-        listOf("Ri rima","Tidak di kenal"),
-        {},
-        {},
-        {},
-        {}
-    )
+//    WordListCard(
+//        WordTranslationModel(
+//            english = EnglishWordsTable(),
+//            indonesianWords = listOf()
+//        ),0,
+//
+//        {},
+//        {},
+//        {},
+//        {}
+//    )
 }

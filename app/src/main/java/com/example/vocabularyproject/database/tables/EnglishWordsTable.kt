@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
     indices = [Index(value = ["eWord"], unique = true)] // This makes eWord unique
 )
 data class EnglishWordsTable(
-    @PrimaryKey(autoGenerate = true) // Usually better to auto-generate if eWord is the unique identifier
+    @PrimaryKey
     var eId: Long = 0L,
     var eWord: String = "",
     var definition: String = ""

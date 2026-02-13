@@ -19,6 +19,29 @@ class VocabularyRepository @Inject constructor(
     private val correlatedWordsDao: CorrelatedWordsDao
     ){
 
+    suspend fun insertDummyData() {
+        withContext(Dispatchers.IO) {
+
+            repeat(500) { index ->
+
+                val eWord = "WORD_$index"
+                val definition = "Definition for word $index"
+
+                val indoWords = listOf(
+                    "arti_${index}_1",
+                    "arti_${index}_2",
+                    "arti_${index}_3"
+                )
+
+                saveFullWordEntry(
+                    eWord = eWord,
+                    definition = definition,
+                    iWords = indoWords
+                )
+            }
+        }
+    }
+
     suspend fun saveFullWordEntry(eWord: String, definition: String, iWords: List<String>) {
         withContext(Dispatchers.IO) {
             correlatedWordsDao.saveFullWordEntry(eWord, definition, iWords)

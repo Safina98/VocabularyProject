@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -43,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -53,6 +56,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieAnimatable
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.vocabularyproject.ui.widgetstyles.HomeScreenButtonStyles
@@ -74,33 +78,23 @@ fun PermainanScreen(
     val isRevealed by iWViewModel.isRevealed.collectAsStateWithLifecycle()
     val answerText by iWViewModel.answerText.collectAsStateWithLifecycle()
     val isAnswerCorrect by iWViewModel.isAnswerCorrect.collectAsStateWithLifecycle()
+    val lottieAnimatable = rememberLottieAnimatable()
 
     // 1. Setup the composition
     val composition by rememberLottieComposition(
-        LottieCompositionSpec.Url("https://lottie.host/ceb39301-853c-4773-a3c3-c3f4b1a19d09/Fdo5XV3kic.lottie")
+        LottieCompositionSpec.RawRes(R.raw.code)
     )
 
-// 2. Setup the animatable
-    val lottieAnimatable = rememberLottieAnimatable()
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever
+    )
 
 // 3. Trigger the animation
-
-
-
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = BiasAlignment(horizontalBias = 0f, verticalBias = -0.2f)
     ) {
-//        if (composition == null) {
-//            Log.i("PermainanScreen","composition is null")
-//        } else {
-//            Log.i("PermainanScreen","composition exist")
-//            LottieAnimation(
-//                composition = composition,
-//                iterations = LottieConstants.IterateForever,
-//                modifier = Modifier.fillMaxSize()
-//            )
-//        }
 
         AnimatedContent(
             targetState = cardIndex,
@@ -117,7 +111,7 @@ fun PermainanScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(350.dp)
+                    .wrapContentHeight()
                     .padding(16.dp)
                     .clickable { },
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -125,7 +119,8 @@ fun PermainanScreen(
             ) {
                 Column(
                     modifier = Modifier
-                        .fillMaxSize() // Use fillMaxSize to cover the internal area of the card
+                        .fillMaxWidth()
+                        .wrapContentHeight()// Use fillMaxSize to cover the internal area of the card
                         .background(brush = Brush.horizontalGradient(colors = cardGradientColors))
                         .padding(12.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -154,7 +149,16 @@ fun PermainanScreen(
                         modifier = Modifier.fillMaxWidth(),
                         gradientColors = buttonGradientClolor
                     )
-
+                    Text(
+                        modifier = Modifier,
+                        text = if (isRevealed) {
+                            answerText
+                        } else {
+                            "●".repeat(answerText.length.coerceAtMost(15)) // Limit length so it doesn't look messy
+                        },
+                        fontSize = 16.sp,
+                        fontStyle = FontStyle.Italic
+                    )
 
                     Text(
                         modifier = Modifier,
@@ -167,7 +171,7 @@ fun PermainanScreen(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
-                    Spacer(modifier = Modifier.weight(1f)) // This pushes everything below it to the bottom
+                    Spacer(modifier = Modifier.height(16.dp)) // This pushes everything below it to the bottom
                     Text(
                         text = "Next",
                         modifier = Modifier
@@ -180,22 +184,69 @@ fun PermainanScreen(
                 }
             }
         }
-        if (isAnswerCorrect) {
+        LaunchedEffect(isAnswerCorrect, composition) {
+            if (isAnswerCorrect && composition != null) {
+                lottieAnimatable.animate(
+                    composition = composition,
+                    iterations = LottieConstants.IterateForever
+                )
+            }
+        }
+
+        if (isAnswerCorrect && composition != null) {
             LottieAnimation(
                 composition = composition,
                 progress = { lottieAnimatable.progress },
                 modifier = Modifier
-                    .fillMaxSize() // This fills the whole screen outside the card
-                    .pointerInput(Unit) { /* Optional: prevents clicking through fireworks */ },
+                    .height(200.dp)
+                    .width(200.dp)
+                    .pointerInput(Unit) {},
                 contentScale = ContentScale.FillBounds
             )
-        }
+            LottieAnimation(
+                composition = composition,
+                progress = { lottieAnimatable.progress },
+                modifier = Modifier
+                    .height(150.dp)
+                    .width(150.dp)
+                    .pointerInput(Unit) {}
+                    .align(Alignment.TopStart), // Align to top-left of the Box
+                contentScale = ContentScale.FillBounds
+            )
 
-        // LaunchedEffect can stay anywhere, but keeping it at the top is fine
-        LaunchedEffect(isAnswerCorrect) {
-            if (isAnswerCorrect) {
-                lottieAnimatable.animate(composition = composition)
-            }
+            // Top-right animation
+            LottieAnimation(
+                composition = composition,
+                progress = { lottieAnimatable.progress },
+                modifier = Modifier
+                    .height(150.dp)
+                    .width(150.dp)
+                    .align(Alignment.TopEnd)
+                    .pointerInput(Unit) {},// Align to top-right of the Box
+                contentScale = ContentScale.FillBounds
+            )
+            LottieAnimation(
+                composition = composition,
+                progress = { lottieAnimatable.progress },
+                modifier = Modifier
+                    .height(250.dp)
+                    .width(250.dp)
+                    .pointerInput(Unit) {}
+                    .align(Alignment.BottomStart), // Align to top-left of the Box
+                contentScale = ContentScale.FillBounds
+            )
+
+            // Top-right animation
+            LottieAnimation(
+                composition = composition,
+                progress = { lottieAnimatable.progress },
+                modifier = Modifier
+                    .height(250.dp)
+                    .width(250.dp)
+                    .align(Alignment.BottomEnd)
+                    .pointerInput(Unit) {},// Align to top-right of the Box
+                contentScale = ContentScale.FillBounds
+            )
         }
     }
 }

@@ -25,6 +25,9 @@ fun MainScreen() {
                 },
                 onPermainanClick = {
                     navController.navigate(Screen.Permainan.route)
+                },
+                onSettingClick = {
+                    navController.navigate(Screen.Setting.route)
                 }
             )
         }
@@ -43,6 +46,9 @@ fun MainScreen() {
         }
         composable (Screen.Permainan.route){
             PermainanScreen()
+        }
+        composable (Screen.Setting.route){
+            SettingScreen()
         }
         // Add more composables for other screens if needed)
 

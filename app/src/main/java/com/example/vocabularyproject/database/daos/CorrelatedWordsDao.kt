@@ -46,7 +46,7 @@ interface CorrelatedWordsDao {
 
     // --- The Professional Transactional Method ---
     @Transaction
-    open suspend fun saveFullWordEntry(eWord: String, definition: String, iWords: List<String>) {
+    suspend fun saveFullWordEntry(eWord: String, definition: String, iWords: List<String>) {
         val cleanEWord = eWord.trim().uppercase()
 
         // 1. Get or Create English Word

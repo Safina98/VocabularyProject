@@ -108,7 +108,7 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
     }
     fun checkAnswer(){
        currentItem.value?.indonesianWords?.forEach {
-           if (answer.value.trim().uppercase()==it.iWord){
+           if (answer.value.trim().uppercase()==it.iWord.uppercase()){
                isAnswerCorrectM.value=true
            }
        }
@@ -175,6 +175,12 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
             }
         }
     }
+    fun generateDummyData() {
+        viewModelScope.launch {
+            repository.insertDummyData()
+        }
+    }
+
     fun saveWord() {
         viewModelScope.launch {
             repository.saveFullWordEntry(eWordM.value.trim().uppercase(),definitionM.value.trim().uppercase(),iWordsListM.value)

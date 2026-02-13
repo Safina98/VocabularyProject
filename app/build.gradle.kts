@@ -21,9 +21,25 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+    signingConfigs {
+        create("release") {
+            storeFile = file("${System.getProperty("user.home")}/.android/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
 
     buildTypes {
+
+        debug {
+            signingConfig = signingConfigs.getByName("release")
+            isDebuggable = true
+        }
+
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -41,6 +57,8 @@ android {
     buildFeatures {
         compose = true
     }
+
+
 }
 
 dependencies {
@@ -70,8 +88,10 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler) // Using KSP instead of kapt
 
-    implementation(libs.airbnb.lottie.compose)
+    implementation(libs.lottie)
+    implementation(libs.lottie.compose)
     //implementation("com.github.LottieFiles:dotlottie-android:0.0.3")
+    implementation(libs.androidx.recyclerview)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
