@@ -43,21 +43,14 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun VocabularyProjectTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = false,
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     colorScheme: ColorScheme = if (darkTheme) darkColorScheme() else lightColorScheme(),
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
+    val colorScheme = LightColorScheme
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
 
     val verticalStripeGradient = Brush.linearGradient(
         0.0f to pomeloOlive, // Stripe 1

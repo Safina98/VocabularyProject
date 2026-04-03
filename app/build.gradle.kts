@@ -30,14 +30,11 @@ android {
         }
     }
 
-
     buildTypes {
-
         debug {
-            signingConfig = signingConfigs.getByName("release")
+           // signingConfig = signingConfigs.getByName("release")
             isDebuggable = true
         }
-
         release {
             signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
@@ -57,8 +54,6 @@ android {
     buildFeatures {
         compose = true
     }
-
-
 }
 
 dependencies {

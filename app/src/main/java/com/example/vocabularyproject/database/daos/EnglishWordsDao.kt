@@ -50,5 +50,8 @@ interface EnglishWordsDao {
     @Query("SELECT * FROM english_words")
     fun getWordTranslationList(): Flow<List<WordTranslationModel>>
 
+    @Query("SELECT COUNT(*) FROM english_words")
+    fun getCount(): Flow<Int>
+
 
 }

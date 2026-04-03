@@ -1,12 +1,12 @@
 package com.example.vocabularyproject.ui.screens
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,6 +33,7 @@ import com.example.vocabularyproject.viewmodels.InputWordViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.vocabularyproject.ui.widgetstyles.TransparentButton
 import com.example.vocabularyproject.util.buttonGradientClolor
+import com.example.vocabularyproject.util.cardGradientBrush
 
 
 @Composable
@@ -45,7 +46,6 @@ fun InputKataScreen(
     val words by iWViewModel.iWordsListL.collectAsState()
     val eWord by iWViewModel.eWordM.collectAsState()
     val definition by iWViewModel.definitionM.collectAsState()
-    iWViewModel.generateDummyData()
 
     Box(
         modifier = Modifier.fillMaxSize().padding(8.dp),
@@ -64,6 +64,7 @@ fun InputKataScreen(
     ) {
     Column(
         modifier = Modifier.fillMaxWidth()
+            .background(brush = cardGradientBrush)
             .wrapContentHeight(),
         verticalArrangement = Arrangement.Center, // Centers vertically
         horizontalAlignment = Alignment.CenterHorizontally // Centers horizontally
@@ -122,7 +123,6 @@ fun InputKataScreen(
     }
     }
 }
-
 //@Preview(showBackground = true)
 //@Composable
 //fun InputKataScreenPreview() {

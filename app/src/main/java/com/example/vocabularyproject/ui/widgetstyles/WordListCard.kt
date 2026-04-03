@@ -75,7 +75,6 @@ fun WordListCard(wordTransa: WordTranslationModel, index: Int,
                         modifier = Modifier.clickable { onEDefinitionClick() },
                         text = "${wordTransa.english.definition.lowercase()} :",
                         style = MaterialTheme.typography.bodySmall,
-                        // If the definition is long, it will wrap automatically here
                     )
                 }
 

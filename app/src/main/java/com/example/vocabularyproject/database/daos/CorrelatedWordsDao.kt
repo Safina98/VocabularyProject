@@ -23,6 +23,10 @@ interface CorrelatedWordsDao {
     @Query("DELETE FROM correlated_words WHERE cId = :id")
     fun delete(id: Long)
 
+    @Query("DELETE FROM english_words\n" +
+            "WHERE eWord LIKE '%WORD_%'")
+    fun deleteDummy()
+
     @Query("SELECT * FROM correlated_words")
     fun selectAllCorrelatedIds(): Flow<List<CorrelatedWord>>
 

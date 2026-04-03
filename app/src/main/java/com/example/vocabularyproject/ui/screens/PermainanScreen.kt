@@ -64,21 +64,27 @@ import com.example.vocabularyproject.util.buttonGradientClolor
 import com.example.vocabularyproject.util.cardGradientColors
 import com.example.vocabularyproject.viewmodels.InputWordViewModel
 import com.example.vocabularyproject.R
+import com.example.vocabularyproject.viewmodels.GameViewModel
 
 @Composable
 fun PermainanScreen(
-    iWViewModel: InputWordViewModel = hiltViewModel()
+
+    gViewModel: GameViewModel
 ) {
    //hide answer
     //when submit clicked show answer
     //fireworks if the answer correct?
-    val currentItem by iWViewModel.currentItem.collectAsStateWithLifecycle()
-    val cardIndex by iWViewModel.cardIndex.collectAsStateWithLifecycle()
-    val answer by iWViewModel.answer.collectAsState()
-    val isRevealed by iWViewModel.isRevealed.collectAsStateWithLifecycle()
-    val answerText by iWViewModel.answerText.collectAsStateWithLifecycle()
-    val isAnswerCorrect by iWViewModel.isAnswerCorrect.collectAsStateWithLifecycle()
+    val currentItem by gViewModel.currentItem.collectAsStateWithLifecycle()
+    val cardIndex by gViewModel.cardIndex.collectAsStateWithLifecycle()
+    val answer by gViewModel.answer.collectAsState()
+    val isRevealed by gViewModel.isRevealed.collectAsStateWithLifecycle()
+    val answerText by gViewModel.answerText.collectAsStateWithLifecycle()
+    val isAnswerCorrect by gViewModel.isAnswerCorrect.collectAsStateWithLifecycle()
     val lottieAnimatable = rememberLottieAnimatable()
+
+    val selectedBatch by gViewModel.selectedBatch.collectAsState()
+
+    Log.i("PermainanScreen","$selectedBatch")
 
     // 1. Setup the composition
     val composition by rememberLottieComposition(
@@ -136,15 +142,15 @@ fun PermainanScreen(
                     Spacer(modifier = Modifier.height(20.dp))
                     OutlinedTextField(
                         value = answer,
-                        onValueChange = { newText ->iWViewModel.answer.value = newText }, // Update state when typing
+                        onValueChange = { newText ->gViewModel.answer.value = newText }, // Update state when typing
                         label = { Text("Word") },
                         modifier = Modifier.fillMaxWidth()
                     )
                     HomeScreenButtonStyles(
                         "Submit",
                         onClick = {
-                            iWViewModel.checkAnswer()
-                            iWViewModel.toggleReveal()
+                            gViewModel.checkAnswer()
+                            gViewModel.toggleReveal()
                                   },
                         modifier = Modifier.fillMaxWidth(),
                         gradientColors = buttonGradientClolor
@@ -177,7 +183,7 @@ fun PermainanScreen(
                         modifier = Modifier
                             .align(Alignment.End)
                             .clickable {
-                                iWViewModel.nextCard()
+                                gViewModel.nextCard()
                                 targetIndex
                             }
                     )

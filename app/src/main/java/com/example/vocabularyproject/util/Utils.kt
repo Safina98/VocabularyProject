@@ -14,6 +14,14 @@ enum class EditField {
     I_WORDS
 }
 
+object OpsiPermaian {
+    const val opt1semuakata= "Semua kata"
+    const val opt2katadipilih = "kata tertentu"
+    const val opt3batchkata = "batch kata"
+}
+val opsiList = OpsiPermaian::class.java.declaredFields
+    .filter { it.type == String::class.java }
+    .map { it.get(null) as String }
 val cardGradientColors = listOf(brookGreen, brookGreenLight, brookGreen)
 val cardGradientBrush = Brush.horizontalGradient(colors = cardGradientColors)
 val buttonGradientClolor = listOf(amarath, amarath, amarath)

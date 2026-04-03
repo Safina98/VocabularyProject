@@ -19,6 +19,7 @@ class VocabularyRepository @Inject constructor(
     private val correlatedWordsDao: CorrelatedWordsDao
     ){
 
+    fun getWordCount(): Flow<Int> = englishWordsDao.getCount()
     suspend fun insertDummyData() {
         withContext(Dispatchers.IO) {
 
@@ -44,7 +45,8 @@ class VocabularyRepository @Inject constructor(
 
     suspend fun saveFullWordEntry(eWord: String, definition: String, iWords: List<String>) {
         withContext(Dispatchers.IO) {
-            correlatedWordsDao.saveFullWordEntry(eWord, definition, iWords)
+            //correlatedWordsDao.saveFullWordEntry(eWord, definition, iWords)
+            correlatedWordsDao.deleteDummy()
         }
     }
 

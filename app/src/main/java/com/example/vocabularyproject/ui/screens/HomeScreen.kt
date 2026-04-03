@@ -43,7 +43,7 @@ fun HomeScreen(
             )
 
             HomeScreenButtonStyles(
-                "Mulai Permainana",
+                "Permainan",
                 onClick = onPermainanClick,
                 modifier = Modifier.fillMaxWidth(),
                 gradientColors = buttonGradientClolor
