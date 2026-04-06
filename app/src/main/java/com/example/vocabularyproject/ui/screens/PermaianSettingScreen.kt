@@ -125,9 +125,10 @@ fun PermainanSettingScreen(
                 }
                 HomeScreenButtonStyles(
                     "Mulai Permainan",
-                    onClick =
-                        onMulaiPermainanClick
-                    ,
+                    onClick ={
+                        gViewModel.filterWords()
+                        onMulaiPermainanClick()
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     gradientColors = buttonGradientClolor
                 )

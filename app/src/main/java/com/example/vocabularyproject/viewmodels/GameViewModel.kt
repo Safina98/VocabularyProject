@@ -1,10 +1,10 @@
 package com.example.vocabularyproject.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vocabularyproject.database.VocabularyRepository
 import com.example.vocabularyproject.database.models.WordTranslationModel
+import com.example.vocabularyproject.util.OpsiPermaian
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.text.isEmpty
 import kotlin.text.toInt
@@ -30,12 +31,15 @@ class GameViewModel@Inject constructor( private val repository: VocabularyReposi
     val batchQuantity : StateFlow<Int> get() =_batchQuantity
 
     val wtModelList =
-        repository.getWordTranslationList()
+        repository.getWordTranslationFlowList()
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = emptyList()
             )
+    val _newWtList= MutableStateFlow<List<WordTranslationModel>>(listOf())
+    val newWtList : StateFlow<List<WordTranslationModel>> get() = _newWtList
+
 
     val randomizedWtList = wtModelList.map { list ->
         list.shuffled()
@@ -52,7 +56,7 @@ class GameViewModel@Inject constructor( private val repository: VocabularyReposi
 
     // 2. The Current Item (derived from the list and the index)
     val currentItem: StateFlow<WordTranslationModel?> = combine(
-        randomizedWtList,
+        newWtList,
         cardIndexM
     ) { list, index ->
         list.getOrNull(index)
@@ -74,8 +78,6 @@ class GameViewModel@Inject constructor( private val repository: VocabularyReposi
 
     val currentId = MutableStateFlow<Long?>(null)
 
-
-
     val batchList: StateFlow<List<String>> = combine(
         repository.getWordCount(),
         _batchQuantity
@@ -93,19 +95,15 @@ class GameViewModel@Inject constructor( private val repository: VocabularyReposi
         initialValue = emptyList()
     )
 
-
     fun onOptionMenuChange(newValue :String){
         _selectedOption.value=newValue
     }
     fun onBatchListSelected(newValue: String){
         _selectedBatch.value=newValue
     }
-
-
     fun setBatchQuantity(newValue: String){
         _batchQuantity.value = if (newValue.isEmpty()) 0 else newValue.toInt() //
     }
-
     fun checkAnswer(){
         currentItem.value?.indonesianWords?.forEach {
             if (answer.value.trim().uppercase()==it.iWord.uppercase()){
@@ -117,7 +115,6 @@ class GameViewModel@Inject constructor( private val repository: VocabularyReposi
     fun setCurrentId(eId: Long) {
         currentId.value = eId
     }
-
     fun toggleReveal() {
         isRevealedM.value = true
     }
@@ -128,5 +125,26 @@ class GameViewModel@Inject constructor( private val repository: VocabularyReposi
         answer.value=""
         isAnswerCorrectM.value=false
     }
+    fun filterWords(){
+        viewModelScope.launch {
+            when(selectedOption.value){
+                OpsiPermaian.opt1semuakata->{
+                    _newWtList.value=repository.getWordTranslationList().shuffled()
+                }
+                OpsiPermaian.opt2katadipilih->{
 
+                }
+                OpsiPermaian.opt3batchkata->{
+                    val batch = _selectedBatch.value // e.g. "21 to 30"
+                    val parts = batch.split("-")
+                    val start = parts[0].trim().toInt()
+                    val end = parts[1].trim().toInt()
+                    val listRange=repository.getWordsByRange(start, end)
+
+                    _newWtList.value = listRange.shuffled()
+                }
+                else->{}
+            }
+        }
+    }
 }

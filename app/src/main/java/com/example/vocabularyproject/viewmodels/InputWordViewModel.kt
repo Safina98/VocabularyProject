@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vocabularyproject.database.VocabularyRepository
-import com.example.vocabularyproject.database.models.WordTranslationModel
 import com.example.vocabularyproject.database.tables.CorrelatedWord
 import com.example.vocabularyproject.database.tables.IndonesianWordsTable
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,9 +33,8 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
 
-
     val wtModelList =
-        repository.getWordTranslationList()
+        repository.getWordTranslationFlowList()
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
@@ -50,10 +48,6 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = emptyList()
     )
-
-
-
-
 
    val currentId = MutableStateFlow<Long?>(null)
 

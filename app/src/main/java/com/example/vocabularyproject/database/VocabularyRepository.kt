@@ -34,19 +34,15 @@ class VocabularyRepository @Inject constructor(
                     "arti_${index}_3"
                 )
 
-                saveFullWordEntry(
-                    eWord = eWord,
-                    definition = definition,
-                    iWords = indoWords
-                )
+                //saveFullWordEntry(eWord = eWord, definition = definition, iWords = indoWords)
             }
         }
     }
 
     suspend fun saveFullWordEntry(eWord: String, definition: String, iWords: List<String>) {
         withContext(Dispatchers.IO) {
-            //correlatedWordsDao.saveFullWordEntry(eWord, definition, iWords)
-            correlatedWordsDao.deleteDummy()
+            correlatedWordsDao.saveFullWordEntry(eWord, definition, iWords)
+          //  correlatedWordsDao.deleteDummy()
         }
     }
 
@@ -74,8 +70,22 @@ class VocabularyRepository @Inject constructor(
 
     fun getAllEnglishWords(): Flow<List<EnglishWordsTable>> =
         englishWordsDao.getEnglishWords()
-    fun getWordTranslationList(): Flow<List<WordTranslationModel>> =
-        englishWordsDao.getWordTranslationList()
+    fun getWordTranslationFlowList(): Flow<List<WordTranslationModel>> =
+        englishWordsDao.getWordTranslationFlowList()
+
+    suspend fun getWordTranslationList(): List<WordTranslationModel> {
+        return withContext(Dispatchers.IO){
+            englishWordsDao.getWordTranslationList()
+        }
+    }
+
+    suspend fun getWordsByRange(start: Int, end: Int): List<WordTranslationModel> {
+        return withContext(Dispatchers.IO){
+            val offset = start - 1
+            val limit = end - start + 1
+             englishWordsDao.getWordsByRange(limit, offset)
+        }
+    }
 
 
     //////////////////////////////////////////////////////////////////////////////////
