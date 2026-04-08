@@ -16,7 +16,7 @@ enum class EditField {
 
 object OpsiPermaian {
     const val opt1semuakata= "Semua kata"
-    const val opt2katadipilih = "kata tertentu"
+   // const val opt2katadipilih = "kata tertentu"
     const val opt3batchkata = "batch kata"
 }
 val opsiList = OpsiPermaian::class.java.declaredFields

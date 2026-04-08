@@ -1,5 +1,6 @@
 package com.example.vocabularyproject.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vocabularyproject.database.VocabularyRepository
@@ -72,6 +73,7 @@ class GameViewModel@Inject constructor( private val repository: VocabularyReposi
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = ""
     )
+
     private val isAnswerCorrectM=MutableStateFlow(false)
     val isAnswerCorrect: StateFlow<Boolean> = isAnswerCorrectM.asStateFlow()
     val answer = MutableStateFlow("")
@@ -109,8 +111,8 @@ class GameViewModel@Inject constructor( private val repository: VocabularyReposi
             if (answer.value.trim().uppercase()==it.iWord.uppercase()){
                 isAnswerCorrectM.value=true
             }
-
         }
+
     }
     fun setCurrentId(eId: Long) {
         currentId.value = eId
@@ -127,24 +129,28 @@ class GameViewModel@Inject constructor( private val repository: VocabularyReposi
     }
     fun filterWords(){
         viewModelScope.launch {
+            cardIndexM.value=0
             when(selectedOption.value){
                 OpsiPermaian.opt1semuakata->{
                     _newWtList.value=repository.getWordTranslationList().shuffled()
                 }
-                OpsiPermaian.opt2katadipilih->{
 
-                }
                 OpsiPermaian.opt3batchkata->{
                     val batch = _selectedBatch.value // e.g. "21 to 30"
                     val parts = batch.split("-")
-                    val start = parts[0].trim().toInt()
-                    val end = parts[1].trim().toInt()
-                    val listRange=repository.getWordsByRange(start, end)
+                    val start = parts[0].trim().toIntOrNull()
+                    val end = parts[1].trim().toIntOrNull()
+                    if (start!=null && end!=null) {
+                        val listRange=repository.getWordsByRange(start, end)
+                        _newWtList.value = listRange.shuffled()
+                    }
 
-                    _newWtList.value = listRange.shuffled()
                 }
                 else->{}
             }
         }
+    }
+    fun resetIndex(){
+
     }
 }

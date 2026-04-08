@@ -2,6 +2,7 @@ package com.example.vocabularyproject.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -81,7 +83,9 @@ fun PermainanSettingScreen(
             Column(
                 modifier = Modifier.fillMaxWidth()
                     .background(brush = cardGradientBrush)
+                    .padding(16.dp)
                     .wrapContentHeight(),
+
                 verticalArrangement = Arrangement.Center, // Centers vertically
                 horizontalAlignment = Alignment.CenterHorizontally // Centers horizontally
             ){
@@ -100,7 +104,7 @@ fun PermainanSettingScreen(
                             value = qty, // Display current state
                             onValueChange = { newText -> qty=newText }, // Update state when typing
                             label = { Text("Jumlah kata") },
-                            modifier = Modifier.padding(start = 16.dp).weight(1f),
+                            modifier = Modifier.weight(1f),
                             placeholder = { Text("Jumlah Kata") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                         )
@@ -110,24 +114,41 @@ fun PermainanSettingScreen(
                             onClick ={ gViewModel.setBatchQuantity(qty) } ,
                         )
                     }
-                    Column(
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(max = 200.dp) // limit height so scrolling can happen
-                            .verticalScroll(rememberScrollState())
+                            .heightIn(max = 150.dp)
+                            .border(
+                                width = 1.dp,
+                                color = Color.Gray,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .padding(horizontal = 8.dp)
                     ) {
-                        RadioButtonGroup(
-                            options = batchList,
-                            selectedOption = selectedBatch,
-                            onOptionSelected = { gViewModel.onBatchListSelected(it) }
-                        )
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            RadioButtonGroup(
+                                options = batchList,
+                                selectedOption = selectedBatch,
+                                onOptionSelected = { gViewModel.onBatchListSelected(it) }
+                            )
+                        }
                     }
                 }
                 HomeScreenButtonStyles(
                     "Mulai Permainan",
                     onClick ={
-                        gViewModel.filterWords()
-                        onMulaiPermainanClick()
+                        if (selectedOption.isNotEmpty()){
+                            if (selectedOption== OpsiPermaian.opt3batchkata && selectedBatch.isEmpty()) {
+
+                            }else{
+                                gViewModel.filterWords()
+                                onMulaiPermainanClick()
+                            }
+                        }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     gradientColors = buttonGradientClolor

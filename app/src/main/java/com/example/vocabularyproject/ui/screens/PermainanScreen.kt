@@ -68,7 +68,7 @@ import com.example.vocabularyproject.viewmodels.GameViewModel
 
 @Composable
 fun PermainanScreen(
-
+    onNavigateBack: () -> Unit,
     gViewModel: GameViewModel
 ) {
    //hide answer
@@ -84,7 +84,6 @@ fun PermainanScreen(
 
     val selectedBatch by gViewModel.selectedBatch.collectAsState()
 
-    Log.i("PermainanScreen","$selectedBatch")
 
     // 1. Setup the composition
     val composition by rememberLottieComposition(
@@ -147,10 +146,14 @@ fun PermainanScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
                     HomeScreenButtonStyles(
-                        "Submit",
+                        text= if(currentItem?.english?.eWord !=null){"Submit"} else {"Selesai"},
                         onClick = {
                             gViewModel.checkAnswer()
                             gViewModel.toggleReveal()
+                            if(currentItem?.english?.eWord ==null){
+                                //navigate back to PermainanSetting
+                                onNavigateBack()
+                            }
                                   },
                         modifier = Modifier.fillMaxWidth(),
                         gradientColors = buttonGradientClolor
@@ -158,7 +161,7 @@ fun PermainanScreen(
                     Text(
                         modifier = Modifier,
                         text = if (isRevealed) {
-                            answerText
+                            currentItem?.english?.definition ?:""
                         } else {
                             "●".repeat(answerText.length.coerceAtMost(15)) // Limit length so it doesn't look messy
                         },
@@ -177,16 +180,20 @@ fun PermainanScreen(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
+
                     Spacer(modifier = Modifier.height(16.dp)) // This pushes everything below it to the bottom
-                    Text(
-                        text = "Next",
-                        modifier = Modifier
-                            .align(Alignment.End)
-                            .clickable {
-                                gViewModel.nextCard()
-                                targetIndex
-                            }
-                    )
+                    if(currentItem?.english?.eWord !=null){
+                        Text(
+                            text = "Next",
+                            modifier = Modifier
+                                .align(Alignment.End)
+                                .clickable {
+                                    gViewModel.nextCard()
+                                    targetIndex
+                                }
+                        )
+                    }
+
                 }
             }
         }

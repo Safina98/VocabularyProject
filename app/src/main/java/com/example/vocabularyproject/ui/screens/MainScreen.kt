@@ -67,6 +67,7 @@ fun MainScreen() {
                 val gameViewModel: GameViewModel = hiltViewModel(parentEntry)
 
                 PermainanScreen(
+                    onNavigateBack = { navController.popBackStack() },
                     gViewModel = gameViewModel
                 )
             }

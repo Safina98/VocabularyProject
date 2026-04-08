@@ -25,7 +25,7 @@ fun RadioButtonGroup(
     enabled: Boolean = true
 ) {
     Column(
-        modifier = modifier.selectableGroup().padding(12.dp)
+        modifier = modifier.selectableGroup()
     ) {
         label?.let {
             Text(
