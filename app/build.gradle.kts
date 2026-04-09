@@ -32,12 +32,12 @@ android {
 
     buildTypes {
         debug {
-           // signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.getByName("release")
             isDebuggable = true
         }
         release {
             signingConfig = signingConfigs.getByName("release")
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -78,6 +78,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.jetbrains.kotlinx.corutines)
+    implementation(libs.androidx.compose.runtime)
     ksp(libs.androidx.room.compiler)
     //hilt
     implementation(libs.hilt.android)
@@ -87,6 +88,10 @@ dependencies {
     implementation(libs.lottie.compose)
     //implementation("com.github.LottieFiles:dotlottie-android:0.0.3")
     implementation(libs.androidx.recyclerview)
+
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
+    implementation(libs.androidx.room.paging)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

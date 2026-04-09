@@ -1,5 +1,6 @@
 package com.example.vocabularyproject.database.tables
 
+import androidx.compose.runtime.Immutable
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -8,9 +9,10 @@ import androidx.room.PrimaryKey
     tableName = "english_words",
     indices = [Index(value = ["eWord"], unique = true)] // This makes eWord unique
 )
+@Immutable
 data class EnglishWordsTable(
     @PrimaryKey
-    var eId: Long = 0L,
-    var eWord: String = "",
-    var definition: String = ""
+    val eId: Long = 0L,
+    val eWord: String = "",
+    val definition: String = ""
 )

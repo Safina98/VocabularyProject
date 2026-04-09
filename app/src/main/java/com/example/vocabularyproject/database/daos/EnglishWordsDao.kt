@@ -1,5 +1,6 @@
 package com.example.vocabularyproject.database.daos
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -49,6 +50,14 @@ interface EnglishWordsDao {
     @Transaction
     @Query("SELECT * FROM english_words")
     fun getWordTranslationFlowList(): Flow<List<WordTranslationModel>>
+
+    @Transaction
+    @Query("SELECT * FROM english_words")
+    fun getWordTranslationPaged(): PagingSource<Int, WordTranslationModel>
+
+    @Transaction
+    @Query("SELECT * FROM english_words WHERE eWord LIKE '%' || :query || '%'")
+    fun searchWordsPaged(query: String): PagingSource<Int, WordTranslationModel>
 
     @Transaction
     @Query("SELECT * FROM english_words")

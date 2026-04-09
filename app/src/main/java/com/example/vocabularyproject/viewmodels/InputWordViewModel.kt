@@ -3,6 +3,9 @@ package com.example.vocabularyproject.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import com.example.vocabularyproject.database.VocabularyRepository
 import com.example.vocabularyproject.database.tables.CorrelatedWord
 import com.example.vocabularyproject.database.tables.IndonesianWordsTable
@@ -138,20 +141,20 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
         iWordsListM.value=iWords
     }
 
-    val filteredWords = combine(wtModelList, _searchQuery) { words, query ->
-        if (query.isBlank()) {
-            words
-        } else {
-            words.filter { item ->
-                item.english.eWord.contains(query, ignoreCase = true) ||
-                        item.indonesianWords.any { it.iWord.contains(query, ignoreCase = true) }
-            }
+    val filteredWords = _searchQuery
+        .flatMapLatest { query ->
+            Pager(
+                config = PagingConfig(
+                    pageSize = 20,
+                    prefetchDistance = 10,  // ⬆ was 5, now loads earlier
+                    enablePlaceholders = true  // ✅ must be true for placeholder slot to work
+                )
+            ){
+                if (query.isBlank()) repository.getWordTranslationPaged()
+                else repository.searchWordsPaged(query) // see step 4
+            }.flow
         }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList()
-    )
+        .cachedIn(viewModelScope)
 
     fun onSearchQueryChange(newQuery: String) {
         _searchQuery.value = newQuery

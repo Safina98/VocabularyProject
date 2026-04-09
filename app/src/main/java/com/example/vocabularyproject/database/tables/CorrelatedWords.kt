@@ -1,5 +1,6 @@
 package com.example.vocabularyproject.database.tables
 
+import androidx.compose.runtime.Immutable
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
@@ -26,9 +27,10 @@ import androidx.room.Index
         Index("iId")
     ]
 )
+@Immutable
 data class CorrelatedWord(
     @PrimaryKey(autoGenerate = true)
-    var cId: Long = 0L,
-    var eId: Long=0L,
-    var iId: Long=0L
+    val cId: Long = 0L,
+    val eId: Long=0L,
+    val iId: Long=0L
 )

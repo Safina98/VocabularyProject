@@ -3,9 +3,15 @@ package com.example.vocabularyproject.ui.screens
 import DaftarKataAdapter
 import EWordListener
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -32,7 +38,17 @@ import com.example.vocabularyproject.ui.theme.amarath
 import com.example.vocabularyproject.util.EditField
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.vocabularyproject.ui.widgetstyles.WordListCard
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class) // Needed for TopAppBar
@@ -41,7 +57,6 @@ fun DaftarKataScreen(
     iWViewModel: InputWordViewModel = hiltViewModel()
 )
 {
-
     val translations by iWViewModel.translationsM.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
     var showListDialog by remember { mutableStateOf(false) }
@@ -49,14 +64,24 @@ fun DaftarKataScreen(
     var selectedEId by remember { mutableStateOf(0L) }
     var editField by remember { mutableStateOf<EditField?>(null) }
 
-
-    val filteredWords by iWViewModel.filteredWords.collectAsState()
+    val filteredWords = iWViewModel.filteredWords.collectAsLazyPagingItems()
     val searchQuery by iWViewModel.searchQuery.collectAsState()
 
     // We only keep UI-specific state (like is the bar open) in the Screen
     var isSearchActive by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
     val items = (1..50).map { "Item $it" }
+
+    val coroutineScope = rememberCoroutineScope()
+
+    // Detect if the user is at the bottom
+    val isAtBottom by remember {
+        derivedStateOf {
+            val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+            val totalItems = listState.layoutInfo.totalItemsCount
+            lastVisible?.index == totalItems - 1
+        }
+    }
 
     // Filter the list based on query
     Scaffold(
@@ -106,46 +131,92 @@ fun DaftarKataScreen(
             )
         }
     ) { innerPadding -> // This innerPadding is crucial!
-
+        Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding),
-                state = rememberLazyListState()
+                state = listState
             ) {
                 items(
-                    items = filteredWords,
-                    key = { it.english.eId }   // 🔥 Important for smooth performance
-                ) { wordItem ->
+                    count = filteredWords.itemCount,
 
-                    WordListCard(
-                        wordTransa = wordItem,
-                        index = 0, // or remove if not needed
-                        onEWordClick = EWordListener { wtModel ->
-                            iWViewModel.setCurrentId(wtModel.english.eId)
-                            selectedEId = wtModel.english.eId
-                            selectedWord = wtModel.english.eWord
-                            editField = EditField.E_WORD
-                            showDialog = true
-                        },
-                        onEDefinitionClick = {
+                    contentType = { "word_card" }
+                ) {index ->
+                    filteredWords[index]?.let { wordItem ->
+                        val onDelete = remember(wordItem.english.eId) {
+                            {
+                                iWViewModel.deleteEWord(wordItem.english.eId)
+                                iWViewModel.deleteIWords(wordItem.indonesianWords)
+                            }
+                        }
+                        val onIWordsClick = remember(wordItem.english.eId) {
+                            {
+                                iWViewModel.setCurrentId(wordItem.english.eId)
+                                showListDialog = true
+                            }
+                        }
+                        val onEDefinitionClick = remember(wordItem.english.eId) {
+                            {
                             iWViewModel.setCurrentId(wordItem.english.eId)
                             selectedEId = wordItem.english.eId
                             selectedWord = wordItem.english.definition
                             editField = EditField.DEFINITION
                             showDialog = true
-                        },
-                        onIWordsClick = {
-                            iWViewModel.setCurrentId(wordItem.english.eId)
-                            showListDialog = true
-                        },
-                        onDeleteClick = {
-                            iWViewModel.deleteEWord(wordItem.english.eId)
-                            iWViewModel.deleteIWords(wordItem.indonesianWords)
+                            }
                         }
+                        val onEWordClick = remember(wordItem.english.eId) {
+                            EWordListener { wtModel ->
+                                iWViewModel.setCurrentId(wtModel.english.eId)
+                                selectedEId = wtModel.english.eId
+                                selectedWord = wtModel.english.eWord
+                                editField = EditField.E_WORD
+                                showDialog = true
+                            }
+                        }
+                            WordListCard(
+                                wordTransa = wordItem,
+                                index = 0, // or remove if not needed
+                                onEWordClick = onEWordClick,
+                                onEDefinitionClick = onEDefinitionClick,
+                                onIWordsClick = onIWordsClick,
+                                onDeleteClick = onDelete
+                            )
+                    }
+                }
+            }
+            AnimatedVisibility(
+                visible = !isAtBottom,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+            ) {
+                IconButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            listState.scrollToItem(  // ← replace animateScrollToItem with this
+                                listState.layoutInfo.totalItemsCount - 1
+                            )
+                        }
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp)
+                        .background(
+                            color = Color.Black.copy(alpha = 0.3f),
+                            shape = CircleShape
+                        )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = "Scroll to end",
+                        tint = Color.White
                     )
                 }
             }
+        }
 
 
             // Use LazyColumn instead of Column + forEach for better performance
@@ -159,70 +230,7 @@ fun DaftarKataScreen(
                     showDialog = true
                 }
             }
-//            AndroidView(
-//                factory = { context ->
-//                    RecyclerView(context).apply {
-//                        layoutManager = LinearLayoutManager(context)
-//                        adapter = DaftarKataAdapter(
-//                            onEWordClick = EWordListener { wtModel ->
-//                                showDialog = true
-//                                selectedEId = wtModel.english.eId
-//                                selectedWord = wtModel.english.eWord
-//                                editField = EditField.E_WORD
-//                            },
-//                            {}, {}, {}
-//                        )
-//                    }
-//                },
-//                update = { recyclerView ->
-//                    (recyclerView.adapter as? DaftarKataAdapter)
-//                        ?.submitList(filteredWords)
-//                },
-//                modifier = Modifier.fillMaxSize()
-//            )
 
-
-// ... Repeat for other clicks or use a single event handler
-            // Filter the list based on query
-
-            // Use LazyColumn instead of Column + forEach for better performance
-//        LazyColumn(
-//            state = listState,
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(innerPadding), // Prevents toolbar from overlapping content
-//            verticalArrangement = Arrangement.Top,
-//            horizontalAlignment = Alignment.Start
-//        ) {
-//            items(
-//                items = filteredWords,
-//                key = { it.english.eId },
-//                contentType = { "word_item" }
-//            ) { wordItem ->
-//
-//                WordListCard(
-//                    eWord = wordItem.english.eWord,
-//                    defition = wordItem.english.definition,
-//                    translations = listOf(""),
-//                    onEWordClick = { onEWordClickRemembered(wordItem) },
-//                    onEDefinitionClick = {
-//                        iWViewModel.setCurrentId(wordItem.english.eId)
-//                        selectedEId = wordItem.english.eId
-//                        selectedWord = wordItem.english.definition
-//                        editField = EditField.DEFINITION
-//                        showDialog = true
-//                    },
-//                    onIWordsClick = {
-//                        iWViewModel.setCurrentId(wordItem.english.eId)
-//                        showListDialog = true
-//                    },
-//                    onDeleteClick = {
-//                        iWViewModel.deleteEWord(wordItem.english.eId)
-//                        iWViewModel.deleteIWords(wordItem.indonesianWords)
-//                    }
-//                )
-//            }
-//        }
             if (showDialog) {
                 AddWordDialog(
                     id = selectedEId ,

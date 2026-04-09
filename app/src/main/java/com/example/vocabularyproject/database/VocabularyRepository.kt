@@ -1,6 +1,8 @@
 package com.example.vocabularyproject.database
 
 import android.util.Log
+import androidx.paging.PagingSource
+import androidx.room.Query
 import com.example.vocabularyproject.database.daos.CorrelatedWordsDao
 import com.example.vocabularyproject.database.daos.EnglishWordsDao
 import com.example.vocabularyproject.database.daos.IndonesianWordsDao
@@ -72,6 +74,15 @@ class VocabularyRepository @Inject constructor(
         englishWordsDao.getEnglishWords()
     fun getWordTranslationFlowList(): Flow<List<WordTranslationModel>> =
         englishWordsDao.getWordTranslationFlowList()
+
+    fun getWordTranslationPaged(): PagingSource<Int, WordTranslationModel> =
+        englishWordsDao.getWordTranslationPaged()
+
+    fun searchWordsPaged(query: String): PagingSource<Int, WordTranslationModel> =
+        englishWordsDao.searchWordsPaged(query)
+
+
+
 
     suspend fun getWordTranslationList(): List<WordTranslationModel> {
         return withContext(Dispatchers.IO){
