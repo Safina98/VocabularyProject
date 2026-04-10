@@ -36,21 +36,7 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
 
-    val wtModelList =
-        repository.getWordTranslationFlowList()
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = emptyList()
-            )
 
-    val randomizedWtList = wtModelList.map { list ->
-        list.shuffled()
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = emptyList()
-    )
 
    val currentId = MutableStateFlow<Long?>(null)
 

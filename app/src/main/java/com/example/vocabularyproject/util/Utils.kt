@@ -19,6 +19,12 @@ object OpsiPermaian {
    // const val opt2katadipilih = "kata tertentu"
     const val opt3batchkata = "batch kata"
 }
+object BahasaPermaian {
+    const val opt1EnglishToIndonesian= "Inggris ke Indonesia"
+    // const val opt2katadipilih = "kata tertentu"
+    const val opt2IndonesianToEnglish = "Indonesia ke Inggris"
+}
+val bahasaList= BahasaPermaian::class.java.declaredFields.filter { it.type==String::class.java }.map {it.get(null) as String}
 val opsiList = OpsiPermaian::class.java.declaredFields
     .filter { it.type == String::class.java }
     .map { it.get(null) as String }

@@ -1,16 +1,12 @@
 package com.example.vocabularyproject.ui.screens
 
 
-import android.util.Log
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,25 +29,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -62,7 +49,6 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.vocabularyproject.ui.widgetstyles.HomeScreenButtonStyles
 import com.example.vocabularyproject.util.buttonGradientClolor
 import com.example.vocabularyproject.util.cardGradientColors
-import com.example.vocabularyproject.viewmodels.InputWordViewModel
 import com.example.vocabularyproject.R
 import com.example.vocabularyproject.viewmodels.GameViewModel
 
@@ -134,9 +120,10 @@ fun PermainanScreen(
 
                     Text(
                         modifier = Modifier.clickable { },
-                        text = currentItem?.english?.eWord ?: "DONE",
+                        text = currentItem?.questionWord ?: "DONE",
                         fontSize = 36.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     OutlinedTextField(
@@ -146,11 +133,11 @@ fun PermainanScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
                     HomeScreenButtonStyles(
-                        text= if(currentItem?.english?.eWord !=null){"Submit"} else {"Selesai"},
+                        text= if(currentItem?.questionWord !=null){"Submit"} else {"Selesai"},
                         onClick = {
                             gViewModel.checkAnswer()
                             gViewModel.toggleReveal()
-                            if(currentItem?.english?.eWord ==null){
+                            if(currentItem?.questionWord ==null){
                                 //navigate back to PermainanSetting
                                 onNavigateBack()
                             }
@@ -161,11 +148,11 @@ fun PermainanScreen(
                     Text(
                         modifier = Modifier,
                         text = if (isRevealed) {
-                            currentItem?.english?.definition ?:""
+                            currentItem?.definition?.lowercase() ?:""
                         } else {
                             "●".repeat(answerText.length.coerceAtMost(15)) // Limit length so it doesn't look messy
                         },
-                        fontSize = 16.sp,
+                        fontSize = 12.sp,
                         fontStyle = FontStyle.Italic
                     )
 
@@ -182,7 +169,7 @@ fun PermainanScreen(
                     )
 
                     Spacer(modifier = Modifier.height(16.dp)) // This pushes everything below it to the bottom
-                    if(currentItem?.english?.eWord !=null){
+                    if(currentItem?.questionWord !=null){
                         Text(
                             text = "Next",
                             modifier = Modifier
@@ -226,7 +213,6 @@ fun PermainanScreen(
                     .align(Alignment.TopStart), // Align to top-left of the Box
                 contentScale = ContentScale.FillBounds
             )
-
             // Top-right animation
             LottieAnimation(
                 composition = composition,
@@ -256,9 +242,8 @@ fun PermainanScreen(
                 modifier = Modifier
                     .height(250.dp)
                     .width(250.dp)
-                    .align(Alignment.BottomEnd)
-                    .pointerInput(Unit) {},// Align to top-right of the Box
-                contentScale = ContentScale.FillBounds
+                    .align(Alignment.BottomEnd),
+                contentScale = ContentScale.FillBounds,
             )
         }
     }

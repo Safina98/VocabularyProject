@@ -1,6 +1,6 @@
 package com.example.vocabularyproject.ui.screens
 
-import DaftarKataAdapter
+
 import EWordListener
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
@@ -8,10 +8,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -28,20 +26,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.vocabularyproject.database.models.WordTranslationModel
 import com.example.vocabularyproject.ui.dialogs.AddWordDialog
 import com.example.vocabularyproject.ui.dialogs.ListDialog
 import com.example.vocabularyproject.ui.theme.amarath
 import com.example.vocabularyproject.util.EditField
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -70,7 +62,7 @@ fun DaftarKataScreen(
     // We only keep UI-specific state (like is the bar open) in the Screen
     var isSearchActive by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
-    val items = (1..50).map { "Item $it" }
+
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -82,7 +74,6 @@ fun DaftarKataScreen(
             lastVisible?.index == totalItems - 1
         }
     }
-
     // Filter the list based on query
     Scaffold(
         containerColor = Color.Transparent,
@@ -127,7 +118,6 @@ fun DaftarKataScreen(
                     containerColor = amarath,
                     titleContentColor = Color.White
                 )
-
             )
         }
     ) { innerPadding -> // This innerPadding is crucial!
@@ -217,8 +207,6 @@ fun DaftarKataScreen(
                 }
             }
         }
-
-
             // Use LazyColumn instead of Column + forEach for better performance
             // 5. Wrap your lambdas in remember to prevent them from being recreated on every scroll
             val onEWordClickRemembered = remember(selectedEId) {
@@ -230,7 +218,6 @@ fun DaftarKataScreen(
                     showDialog = true
                 }
             }
-
             if (showDialog) {
                 AddWordDialog(
                     id = selectedEId ,
@@ -269,7 +256,4 @@ fun DaftarKataScreen(
                 )
             }
         }
-
-
-
 }

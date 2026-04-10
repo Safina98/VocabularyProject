@@ -2,10 +2,10 @@ package com.example.vocabularyproject.database
 
 import android.util.Log
 import androidx.paging.PagingSource
-import androidx.room.Query
 import com.example.vocabularyproject.database.daos.CorrelatedWordsDao
 import com.example.vocabularyproject.database.daos.EnglishWordsDao
 import com.example.vocabularyproject.database.daos.IndonesianWordsDao
+import com.example.vocabularyproject.database.models.IndonesianToEnglishModel
 import com.example.vocabularyproject.database.models.WordTranslationModel
 import com.example.vocabularyproject.database.tables.CorrelatedWord
 import com.example.vocabularyproject.database.tables.EnglishWordsTable
@@ -21,30 +21,14 @@ class VocabularyRepository @Inject constructor(
     private val correlatedWordsDao: CorrelatedWordsDao
     ){
 
-    fun getWordCount(): Flow<Int> = englishWordsDao.getCount()
-    suspend fun insertDummyData() {
-        withContext(Dispatchers.IO) {
+    fun getEnglishWordCount(): Flow<Int> = englishWordsDao.getCount()
 
-            repeat(500) { index ->
+    fun getIndonesianWordCount(): Flow<Int> = indonesianWordsDao.getCount()
 
-                val eWord = "WORD_$index"
-                val definition = "Definition for word $index"
-
-                val indoWords = listOf(
-                    "arti_${index}_1",
-                    "arti_${index}_2",
-                    "arti_${index}_3"
-                )
-
-                //saveFullWordEntry(eWord = eWord, definition = definition, iWords = indoWords)
-            }
-        }
-    }
 
     suspend fun saveFullWordEntry(eWord: String, definition: String, iWords: List<String>) {
         withContext(Dispatchers.IO) {
             correlatedWordsDao.saveFullWordEntry(eWord, definition, iWords)
-          //  correlatedWordsDao.deleteDummy()
         }
     }
 
@@ -89,12 +73,24 @@ class VocabularyRepository @Inject constructor(
             englishWordsDao.getWordTranslationList()
         }
     }
+    suspend fun getInaToEngTransationList(): List<IndonesianToEnglishModel> {
+        return withContext(Dispatchers.IO){
+            indonesianWordsDao.geInatoEngTranslationList()
+        }
+    }
 
     suspend fun getWordsByRange(start: Int, end: Int): List<WordTranslationModel> {
         return withContext(Dispatchers.IO){
             val offset = start - 1
             val limit = end - start + 1
              englishWordsDao.getWordsByRange(limit, offset)
+        }
+    }
+    suspend fun getInaWordsByRange(start: Int, end: Int): List<IndonesianToEnglishModel> {
+        return withContext(Dispatchers.IO){
+            val offset = start - 1
+            val limit = end - start + 1
+           indonesianWordsDao.getIndonesianWordsByRange(limit,offset)
         }
     }
 

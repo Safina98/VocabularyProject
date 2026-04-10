@@ -22,7 +22,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,21 +32,17 @@ import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.airbnb.lottie.compose.LottieConstants
 import com.example.vocabularyproject.ui.theme.Typography
 import com.example.vocabularyproject.ui.widgetstyles.HomeScreenButtonStyles
 import com.example.vocabularyproject.ui.widgetstyles.RadioButtonGroup
 import com.example.vocabularyproject.ui.widgetstyles.TransparentButton
 import com.example.vocabularyproject.util.OpsiPermaian
+import com.example.vocabularyproject.util.bahasaList
 import com.example.vocabularyproject.util.buttonGradientClolor
 import com.example.vocabularyproject.util.cardGradientBrush
 import com.example.vocabularyproject.util.opsiList
 import com.example.vocabularyproject.viewmodels.GameViewModel
-import com.example.vocabularyproject.viewmodels.InputWordViewModel
 
 @Composable
 fun PermainanSettingScreen(
@@ -62,11 +57,13 @@ fun PermainanSettingScreen(
     //  3. batch of words
     //var selected by remember { mutableStateOf("") }
     val selectedOption by gViewModel.selectedOption.collectAsState()
+    val selectedLanguage by gViewModel.selectedLanguage.collectAsState()
     val selectedBatch by gViewModel.selectedBatch.collectAsState()
     var qty by remember { mutableStateOf("20") }
 
     val batchQuantity by gViewModel.batchQuantity.collectAsState()
     val batchList by gViewModel.batchList.collectAsState()
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = BiasAlignment(horizontalBias = 0f, verticalBias = -0.2f)
@@ -89,7 +86,15 @@ fun PermainanSettingScreen(
                 verticalArrangement = Arrangement.Center, // Centers vertically
                 horizontalAlignment = Alignment.CenterHorizontally // Centers horizontally
             ){
-                Text(modifier = Modifier.padding(24.dp),
+                Text(modifier = Modifier.padding(18.dp),
+                    style = Typography.titleLarge,
+                    text = "Pilih Bahasa")
+                RadioButtonGroup(
+                    options = bahasaList,
+                    selectedOption = selectedLanguage,
+                    onOptionSelected = { gViewModel.onBahasaMenuChange(it) }
+                )
+                Text(modifier = Modifier.padding(18.dp),
                     style = Typography.titleLarge,
                     text = "Pilih Mode")
                 RadioButtonGroup(
@@ -145,7 +150,7 @@ fun PermainanSettingScreen(
                             if (selectedOption== OpsiPermaian.opt3batchkata && selectedBatch.isEmpty()) {
 
                             }else{
-                                gViewModel.filterWords()
+                                gViewModel.onGameStart()
                                 onMulaiPermainanClick()
                             }
                         }

@@ -4,7 +4,10 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import com.example.vocabularyproject.database.models.IndonesianToEnglishModel
+import com.example.vocabularyproject.database.models.WordTranslationModel
 import com.example.vocabularyproject.database.tables.IndonesianWordsTable
 import kotlinx.coroutines.flow.Flow
 
@@ -39,4 +42,13 @@ interface IndonesianWordsDao {
     """)
     fun selectCorelatedIndonesanWords(eId:Long):Flow<List<IndonesianWordsTable>>
 
+    @Query("SELECT COUNT(*) FROM indonesian_words")
+    fun getCount(): Flow<Int>
+
+    @Transaction
+    @Query("SELECT * FROM indonesian_words")
+    fun geInatoEngTranslationList(): List<IndonesianToEnglishModel>
+
+    @Query("SELECT * FROM indonesian_words LIMIT :limit OFFSET :offset")
+    fun getIndonesianWordsByRange(limit: Int, offset: Int): List<IndonesianToEnglishModel>
 }
