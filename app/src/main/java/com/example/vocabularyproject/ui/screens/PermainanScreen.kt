@@ -12,6 +12,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedTextField
@@ -29,14 +32,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -50,6 +61,9 @@ import com.example.vocabularyproject.ui.widgetstyles.HomeScreenButtonStyles
 import com.example.vocabularyproject.util.buttonGradientClolor
 import com.example.vocabularyproject.util.cardGradientColors
 import com.example.vocabularyproject.R
+import com.example.vocabularyproject.ui.theme.Typography
+import com.example.vocabularyproject.ui.widgetstyles.AutoResizeText
+import com.example.vocabularyproject.ui.widgetstyles.FontSizeRange
 import com.example.vocabularyproject.viewmodels.GameViewModel
 
 @Composable
@@ -69,6 +83,8 @@ fun PermainanScreen(
     val lottieAnimatable = rememberLottieAnimatable()
 
     val selectedBatch by gViewModel.selectedBatch.collectAsState()
+    var fontSize by remember(currentItem?.questionWord) { mutableStateOf(36.sp) }
+   // var fontSize by remember { mutableStateOf(36.sp) }
 
 
     // 1. Setup the composition
@@ -118,13 +134,23 @@ fun PermainanScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    Text(
-                        modifier = Modifier.clickable { },
-                        text = currentItem?.questionWord ?: "DONE",
-                        fontSize = 36.sp,
-                        fontWeight = FontWeight.Bold,
 
+                    // Source - https://stackoverflow.com/a/69780826
+                    // Posted by Rahul Sainani
+                    // Retrieved 2026-04-13, License - CC BY-SA 4.0
+                    AutoResizeText(
+                        text = currentItem?.questionWord ?: "DONE",
+                        maxLines = 3,
+                        modifier = Modifier.fillMaxWidth(),
+                        fontSizeRange = FontSizeRange(
+                            min = 10.sp,
+                            max = 36.sp,
+                        ),
+                        overflow = TextOverflow.Ellipsis,
+                        style = Typography.titleLarge
                     )
+
+
                     Spacer(modifier = Modifier.height(20.dp))
                     OutlinedTextField(
                         value = answer,
