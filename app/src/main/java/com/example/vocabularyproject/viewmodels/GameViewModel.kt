@@ -49,7 +49,6 @@ class GameViewModel@Inject constructor( private val repository: VocabularyReposi
     val _inaToEngList= MutableStateFlow<List<IndonesianToEnglishModel>>(listOf())
     val inaToEngList : StateFlow<List<IndonesianToEnglishModel>> get() = _inaToEngList
 
-
     val randomizedWtList = wtModelList.map { list ->
         list.shuffled()
     }.stateIn(
@@ -123,7 +122,7 @@ class GameViewModel@Inject constructor( private val repository: VocabularyReposi
     ) { count, batch ->
         if (batch <= 0) emptyList()
         else {
-            (0 until count step batch).map { start ->
+            listOf("Acak") + (0 until count step batch).map { start ->
                 val end = minOf(start + batch, count)
                 "${start + 1}-${end}"
             }
@@ -193,12 +192,16 @@ class GameViewModel@Inject constructor( private val repository: VocabularyReposi
                 }
                 OpsiPermaian.opt3batchkata->{
                     val batch = _selectedBatch.value // e.g. "21 to 30"
-                    val parts = batch.split("-")
-                    val start = parts[0].trim().toIntOrNull()
-                    val end = parts[1].trim().toIntOrNull()
-                    if (start!=null && end!=null) {
-                        val listRange=repository.getInaWordsByRange(start,end)
-                        _inaToEngList.value = listRange.shuffled()
+                    if (batch=="Acak"){
+                        _inaToEngList.value=repository.getInaToEngTransationList().shuffled().take(_batchQuantity.value)
+                    }else{
+                        val parts = batch.split("-")
+                        val start = parts[0].trim().toIntOrNull()
+                        val end = parts[1].trim().toIntOrNull()
+                        if (start!=null && end!=null) {
+                            val listRange=repository.getInaWordsByRange(start,end)
+                            _inaToEngList.value = listRange.shuffled()
+                        }
                     }
                 }
                 else->{}
@@ -208,22 +211,23 @@ class GameViewModel@Inject constructor( private val repository: VocabularyReposi
     }
     fun filterEnglishWords(){
         viewModelScope.launch {
-
             when(selectedOption.value){
                 OpsiPermaian.opt1semuakata->{
                     _newWtList.value=repository.getWordTranslationList().shuffled()
                 }
-
                 OpsiPermaian.opt3batchkata->{
                     val batch = _selectedBatch.value // e.g. "21 to 30"
-                    val parts = batch.split("-")
-                    val start = parts[0].trim().toIntOrNull()
-                    val end = parts[1].trim().toIntOrNull()
-                    if (start!=null && end!=null) {
-                        val listRange=repository.getWordsByRange(start, end)
-                        _newWtList.value = listRange.shuffled()
+                    if (batch=="Acak"){
+                        _newWtList.value=repository.getWordTranslationList().shuffled().take(_batchQuantity.value)
+                    }else {
+                        val parts = batch.split("-")
+                        val start = parts[0].trim().toIntOrNull()
+                        val end = parts[1].trim().toIntOrNull()
+                        if (start!=null && end!=null) {
+                            val listRange=repository.getWordsByRange(start, end)
+                            _newWtList.value = listRange.shuffled()
+                        }
                     }
-
                 }
                 else->{}
             }

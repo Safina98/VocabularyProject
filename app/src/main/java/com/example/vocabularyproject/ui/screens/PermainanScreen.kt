@@ -63,6 +63,7 @@ import com.example.vocabularyproject.util.cardGradientColors
 import com.example.vocabularyproject.R
 import com.example.vocabularyproject.ui.theme.Typography
 import com.example.vocabularyproject.ui.widgetstyles.AutoResizeText
+import com.example.vocabularyproject.ui.widgetstyles.AutoSizeText
 import com.example.vocabularyproject.ui.widgetstyles.FontSizeRange
 import com.example.vocabularyproject.viewmodels.GameViewModel
 
@@ -140,7 +141,7 @@ fun PermainanScreen(
                     // Retrieved 2026-04-13, License - CC BY-SA 4.0
                     AutoResizeText(
                         text = currentItem?.questionWord ?: "DONE",
-                        maxLines = 3,
+                        maxLines = 1,
                         modifier = Modifier.fillMaxWidth(),
                         fontSizeRange = FontSizeRange(
                             min = 10.sp,
@@ -149,7 +150,6 @@ fun PermainanScreen(
                         overflow = TextOverflow.Ellipsis,
                         style = Typography.titleLarge
                     )
-
 
                     Spacer(modifier = Modifier.height(20.dp))
                     OutlinedTextField(
