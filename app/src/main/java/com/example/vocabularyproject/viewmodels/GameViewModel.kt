@@ -1,5 +1,6 @@
 package com.example.vocabularyproject.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vocabularyproject.database.VocabularyRepository
@@ -14,6 +15,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -117,8 +120,14 @@ class GameViewModel@Inject constructor( private val repository: VocabularyReposi
     val currentId = MutableStateFlow<Long?>(null)
 
     val batchList: StateFlow<List<String>> = combine(
-        flow=if (_selectedLanguage.value== BahasaPermaian.opt1EnglishToIndonesian) repository.getEnglishWordCount() else repository.getIndonesianWordCount(),
-        flow2=_batchQuantity
+        _selectedLanguage.flatMapLatest { language ->
+            when (language) {
+                BahasaPermaian.opt1EnglishToIndonesian -> repository.getEnglishWordCount()
+                BahasaPermaian.opt2IndonesianToEnglish -> repository.getIndonesianWordCount()
+                else -> flowOf(0)
+            }
+        },
+        _batchQuantity
     ) { count, batch ->
         if (batch <= 0) emptyList()
         else {
@@ -132,7 +141,6 @@ class GameViewModel@Inject constructor( private val repository: VocabularyReposi
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
-
     fun onOptionMenuChange(newValue :String){
         _selectedOption.value=newValue
     }
