@@ -61,6 +61,7 @@ androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime
 androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version = "3.3.6" }
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version = "3.3.6" }
 androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "room" }
+androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

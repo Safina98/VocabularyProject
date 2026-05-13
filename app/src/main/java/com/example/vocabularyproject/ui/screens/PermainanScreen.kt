@@ -12,7 +12,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,10 +21,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,15 +41,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -63,9 +62,18 @@ import com.example.vocabularyproject.util.cardGradientColors
 import com.example.vocabularyproject.R
 import com.example.vocabularyproject.ui.theme.Typography
 import com.example.vocabularyproject.ui.widgetstyles.AutoResizeText
-import com.example.vocabularyproject.ui.widgetstyles.AutoSizeText
 import com.example.vocabularyproject.ui.widgetstyles.FontSizeRange
 import com.example.vocabularyproject.viewmodels.GameViewModel
+import android.content.Intent
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
+import android.speech.RecognitionListener
+import android.os.Bundle
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun PermainanScreen(
@@ -83,6 +91,8 @@ fun PermainanScreen(
     val isAnswerCorrect by gViewModel.isAnswerCorrect.collectAsStateWithLifecycle()
     val lottieAnimatable = rememberLottieAnimatable()
 
+    val currentItemRef by rememberUpdatedState(currentItem)
+
     val selectedBatch by gViewModel.selectedBatch.collectAsState()
     var fontSize by remember(currentItem?.questionWord) { mutableStateOf(36.sp) }
    // var fontSize by remember { mutableStateOf(36.sp) }
@@ -97,7 +107,76 @@ fun PermainanScreen(
         composition = composition,
         iterations = LottieConstants.IterateForever
     )
+    val context = LocalContext.current
+    var isListening by remember { mutableStateOf(false) }
+    var pronunciationResult by remember { mutableStateOf<String?>(null) } // "correct" | "incorrect" | null
 
+    // SpeechRecognizer
+    val speechRecognizer = remember { SpeechRecognizer.createSpeechRecognizer(context) }
+    val speechIntent = remember {
+        Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US")
+            putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+        }
+    }
+
+
+// Permission launcher
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            speechRecognizer.startListening(speechIntent)
+            isListening = true
+        }
+    }
+
+
+
+    speechRecognizer.setRecognitionListener(object : RecognitionListener {
+        override fun onResults(results: Bundle) {
+            val spoken = results
+                .getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                ?.firstOrNull() ?: ""
+            val target = currentItemRef?.questionWord ?: ""
+
+            android.os.Handler(android.os.Looper.getMainLooper()).post {
+                pronunciationResult = if (spoken.trim().lowercase() == target.trim().lowercase()) {
+                    "correct"
+                } else {
+                    "incorrect"
+                }
+                isListening = false
+            }
+        }
+        override fun onEndOfSpeech() {
+            android.os.Handler(android.os.Looper.getMainLooper()).post {
+                if (isListening) {
+                    speechRecognizer.cancel()
+                    speechRecognizer.startListening(speechIntent)
+                }
+            }
+        }
+
+        override fun onError(error: Int) {
+            android.os.Handler(android.os.Looper.getMainLooper()).post {
+                if (isListening) {
+                    speechRecognizer.cancel()
+                    speechRecognizer.startListening(speechIntent)
+                } else {
+                    isListening = false
+                }
+            }
+        }
+
+        override fun onReadyForSpeech(params: Bundle?) {}
+        override fun onBeginningOfSpeech() {}
+        override fun onRmsChanged(rmsdB: Float) {}
+        override fun onBufferReceived(buffer: ByteArray?) {}
+        override fun onPartialResults(partialResults: Bundle?) {}
+        override fun onEvent(eventType: Int, params: Bundle?) {}
+    })
 // 3. Trigger the animation
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -193,6 +272,44 @@ fun PermainanScreen(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    IconButton(
+                        onClick = {
+                            if (isListening) {
+                                speechRecognizer.stopListening()
+                                isListening = false
+                            } else {
+                                pronunciationResult = null
+                                permissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
+                            }
+                        },
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .background(
+                                brush = Brush.horizontalGradient(
+                                    colors = if (isListening) listOf(Color.Red, Color.Red)
+                                    else buttonGradientClolor
+                                ),
+                                shape = RoundedCornerShape(50)
+                            ),
+                        colors = IconButtonDefaults.iconButtonColors(contentColor = Color.White)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Mic,
+                            contentDescription = "Record pronunciation",
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+
+                    // --- Pronunciation feedback ---
+                    pronunciationResult?.let { result ->
+                        Text(
+                            text = if (result == "correct") "✅ Correct pronunciation!" else "❌ Try again!",
+                            fontSize = 13.sp,
+                            color = if (result == "correct") Color(0xFF2E7D32) else Color(0xFFC62828),
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(16.dp)) // This pushes everything below it to the bottom
                     if(currentItem?.questionWord !=null){
