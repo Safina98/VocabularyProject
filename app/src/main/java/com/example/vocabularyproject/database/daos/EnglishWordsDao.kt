@@ -52,7 +52,7 @@ interface EnglishWordsDao {
     fun getWordTranslationFlowList(): Flow<List<WordTranslationModel>>
 
     @Transaction
-    @Query("SELECT * FROM english_words")
+    @Query("SELECT * FROM english_words ORDER BY eId DESC")
     fun getWordTranslationPaged(): PagingSource<Int, WordTranslationModel>
 
     @Transaction
