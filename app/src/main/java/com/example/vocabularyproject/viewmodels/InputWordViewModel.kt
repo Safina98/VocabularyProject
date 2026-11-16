@@ -51,6 +51,16 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+
+    private val _selectedLetter = MutableStateFlow("")
+    val selectedLetter = _selectedLetter.asStateFlow()
+
+    fun onLetterSelected(letter: String) {
+        // tapping the same letter again clears the filter
+        _selectedLetter.value = if (_selectedLetter.value == letter) "" else letter
+    }
+
+
     fun setCurrentId(eId: Long) {
         currentId.value = eId
     }
@@ -127,17 +137,16 @@ class InputWordViewModel @Inject constructor( private val repository: Vocabulary
         iWordsListM.value=iWords
     }
 
-    val filteredWords = _searchQuery
-        .flatMapLatest { query ->
+    val filteredWords = combine(_searchQuery, _selectedLetter) { query, letter -> query to letter }
+        .flatMapLatest { (query, letter) ->
             Pager(
                 config = PagingConfig(
                     pageSize = 20,
-                    prefetchDistance = 10,  // ⬆ was 5, now loads earlier
-                    enablePlaceholders = true  // ✅ must be true for placeholder slot to work
+                    prefetchDistance = 10,
+                    enablePlaceholders = true
                 )
-            ){
-                if (query.isBlank()) repository.getWordTranslationPaged()
-                else repository.searchWordsPaged(query) // see step 4
+            ) {
+                repository.searchWordsByLetterPaged(query.trim(), letter)
             }.flow
         }
         .cachedIn(viewModelScope)

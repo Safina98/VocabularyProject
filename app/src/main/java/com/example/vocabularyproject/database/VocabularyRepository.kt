@@ -62,6 +62,9 @@ class VocabularyRepository @Inject constructor(
     fun getWordTranslationPaged(): PagingSource<Int, WordTranslationModel> =
         englishWordsDao.getWordTranslationPaged()
 
+    fun searchWordsByLetterPaged(query: String, letter: String): PagingSource<Int, WordTranslationModel> =
+        englishWordsDao.searchWordsByLetterPaged(query, letter)
+
     fun searchWordsPaged(query: String): PagingSource<Int, WordTranslationModel> =
         englishWordsDao.searchWordsPaged(query)
 

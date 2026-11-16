@@ -60,6 +60,17 @@ interface EnglishWordsDao {
     fun searchWordsPaged(query: String): PagingSource<Int, WordTranslationModel>
 
     @Transaction
+    @Query("""
+    SELECT * FROM english_words
+    WHERE eWord LIKE '%' || :query || '%'
+      AND (:letter = '' OR eWord LIKE :letter || '%')
+    ORDER BY 
+        CASE WHEN :letter = '' THEN eId END DESC,
+        CASE WHEN :letter <> '' THEN eWord END ASC
+""")
+    fun searchWordsByLetterPaged(query: String, letter: String): PagingSource<Int, WordTranslationModel>
+
+    @Transaction
     @Query("SELECT * FROM english_words")
     fun getWordTranslationList(): List<WordTranslationModel>
 
