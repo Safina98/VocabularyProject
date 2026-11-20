@@ -35,6 +35,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.vocabularyproject.ui.theme.Typography
 import com.example.vocabularyproject.ui.widgetstyles.HomeScreenButtonStyles
+import com.example.vocabularyproject.ui.widgetstyles.LetterGrid
 import com.example.vocabularyproject.ui.widgetstyles.RadioButtonGroup
 import com.example.vocabularyproject.ui.widgetstyles.TransparentButton
 import com.example.vocabularyproject.util.OpsiPermaian
@@ -53,12 +54,14 @@ fun PermainanSettingScreen(
     // add a list of chekcbox to pick which batch of words to choose to play the game
     //Game option
     //  1. all words
-    //  2. the words that are marked true
+    //  2. words by the first letter
     //  3. batch of words
     //var selected by remember { mutableStateOf("") }
     val selectedOption by gViewModel.selectedOption.collectAsState()
     val selectedLanguage by gViewModel.selectedLanguage.collectAsState()
     val selectedBatch by gViewModel.selectedBatch.collectAsState()
+    val selectedLetter by gViewModel.selectedLetter.collectAsState()
+
     var qty by remember { mutableStateOf("20") }
 
     val batchQuantity by gViewModel.batchQuantity.collectAsState()
@@ -103,7 +106,7 @@ fun PermainanSettingScreen(
                     onOptionSelected = { gViewModel.onOptionMenuChange(it) }
                 )
 
-                if (selectedOption== OpsiPermaian.opt3batchkata) {
+                if (selectedOption== OpsiPermaian.opt2batchkata) {
                     Row(modifier = Modifier.fillMaxWidth()) {
                         OutlinedTextField(
                             value = qty, // Display current state
@@ -143,11 +146,22 @@ fun PermainanSettingScreen(
                         }
                     }
                 }
+                if (selectedOption == OpsiPermaian.opt4batchkata) {
+                    Text(
+                        modifier = Modifier.padding(12.dp),
+                        style = Typography.titleMedium,
+                        text = "Pilih Huruf Awal"
+                    )
+                    LetterGrid(
+                        selectedLetter = selectedLetter,
+                        onLetterSelected = { gViewModel.onLetterSelected(it) }
+                    )
+                }
                 HomeScreenButtonStyles(
                     "Mulai Permainan",
                     onClick ={
                         if (selectedOption.isNotEmpty()){
-                            if (selectedOption== OpsiPermaian.opt3batchkata && selectedBatch.isEmpty()) {
+                            if (selectedOption== OpsiPermaian.opt2batchkata && selectedBatch.isEmpty()) {
 
                             }else{
                                 gViewModel.onGameStart()

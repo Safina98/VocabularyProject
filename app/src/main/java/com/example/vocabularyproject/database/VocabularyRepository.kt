@@ -89,11 +89,21 @@ class VocabularyRepository @Inject constructor(
              englishWordsDao.getWordsByRange(limit, offset)
         }
     }
+    suspend fun getWordsByLetter(letter: String): List<WordTranslationModel> {
+        return withContext(Dispatchers.IO){
+            englishWordsDao.getWordsFirstLetter(letter)
+        }
+    }
     suspend fun getInaWordsByRange(start: Int, end: Int): List<IndonesianToEnglishModel> {
         return withContext(Dispatchers.IO){
             val offset = start - 1
             val limit = end - start + 1
            indonesianWordsDao.getIndonesianWordsByRange(limit,offset)
+        }
+    }
+    suspend fun getInaWordsByFirstLetter(letter:String): List<IndonesianToEnglishModel> {
+        return withContext(Dispatchers.IO){
+            indonesianWordsDao.getIndonesianWordsByFirstLetter(letter)
         }
     }
 

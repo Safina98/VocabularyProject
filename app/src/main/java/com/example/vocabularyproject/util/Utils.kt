@@ -1,12 +1,9 @@
 package com.example.vocabularyproject.util
 
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import com.example.vocabularyproject.ui.theme.ThulianPink
 import com.example.vocabularyproject.ui.theme.amarath
 import com.example.vocabularyproject.ui.theme.brookGreen
 import com.example.vocabularyproject.ui.theme.brookGreenLight
-import com.example.vocabularyproject.ui.theme.chalk
 
 enum class EditField {
     E_WORD,
@@ -17,7 +14,9 @@ enum class EditField {
 object OpsiPermaian {
     const val opt1semuakata= "Semua kata"
    // const val opt2katadipilih = "kata tertentu"
-    const val opt3batchkata = "batch kata"
+    const val opt2batchkata = "batch kata"
+
+    const val opt4batchkata = "Alphabet"
 }
 object BahasaPermaian {
     const val opt1EnglishToIndonesian= "Inggris ke Indonesia"

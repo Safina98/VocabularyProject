@@ -1,6 +1,5 @@
 package com.example.vocabularyproject.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vocabularyproject.database.VocabularyRepository
@@ -38,6 +37,11 @@ class GameViewModel@Inject constructor( private val repository: VocabularyReposi
 
     private val _batchQuantity= MutableStateFlow<Int>(20)
     val batchQuantity : StateFlow<Int> get() =_batchQuantity
+
+    private val _selectedLetter = MutableStateFlow("A")
+    val selectedLetter: StateFlow<String> get() = _selectedLetter
+
+
 
     val wtModelList =
         repository.getWordTranslationFlowList()
@@ -193,12 +197,11 @@ class GameViewModel@Inject constructor( private val repository: VocabularyReposi
     }
     fun filterIndonesianWords(){
         viewModelScope.launch {
-
             when(selectedOption.value){
                 OpsiPermaian.opt1semuakata->{
                     _inaToEngList.value=repository.getInaToEngTransationList().shuffled()
                 }
-                OpsiPermaian.opt3batchkata->{
+                OpsiPermaian.opt2batchkata->{
                     val batch = _selectedBatch.value // e.g. "21 to 30"
                     if (batch=="Acak"){
                         _inaToEngList.value=repository.getInaToEngTransationList().shuffled().take(_batchQuantity.value)
@@ -212,10 +215,14 @@ class GameViewModel@Inject constructor( private val repository: VocabularyReposi
                         }
                     }
                 }
+
+                OpsiPermaian.opt4batchkata->{
+                    _inaToEngList.value=repository.getInaWordsByFirstLetter(_selectedLetter.value)
+
+                }
                 else->{}
             }
         }
-
     }
     fun filterEnglishWords(){
         viewModelScope.launch {
@@ -223,7 +230,7 @@ class GameViewModel@Inject constructor( private val repository: VocabularyReposi
                 OpsiPermaian.opt1semuakata->{
                     _newWtList.value=repository.getWordTranslationList().shuffled()
                 }
-                OpsiPermaian.opt3batchkata->{
+                OpsiPermaian.opt2batchkata->{
                     val batch = _selectedBatch.value // e.g. "21 to 30"
                     if (batch=="Acak"){
                         _newWtList.value=repository.getWordTranslationList().shuffled().take(_batchQuantity.value)
@@ -237,9 +244,17 @@ class GameViewModel@Inject constructor( private val repository: VocabularyReposi
                         }
                     }
                 }
+
+                OpsiPermaian.opt4batchkata->{
+                    _newWtList.value=repository.getWordsByLetter(_selectedLetter.value)
+
+                }
                 else->{}
             }
         }
+    }
+    fun onLetterSelected(letter: String) {
+        _selectedLetter.value = letter
     }
     fun resetIndex(){
 

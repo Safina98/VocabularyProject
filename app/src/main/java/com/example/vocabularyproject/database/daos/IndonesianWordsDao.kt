@@ -49,6 +49,11 @@ interface IndonesianWordsDao {
     @Query("SELECT * FROM indonesian_words")
     fun geInatoEngTranslationList(): List<IndonesianToEnglishModel>
 
+    @Query("SELECT * FROM indonesian_words " +
+            "WHERE " +
+            "(:letter = '' OR iWord LIKE :letter || '%')")
+    fun getIndonesianWordsByFirstLetter(letter: String): List<IndonesianToEnglishModel>
+
     @Query("SELECT * FROM indonesian_words LIMIT :limit OFFSET :offset")
     fun getIndonesianWordsByRange(limit: Int, offset: Int): List<IndonesianToEnglishModel>
 }

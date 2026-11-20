@@ -81,7 +81,10 @@ interface EnglishWordsDao {
     @Query("SELECT * FROM english_words LIMIT :limit OFFSET :offset")
     fun getWordsByRange(limit: Int, offset: Int): List<WordTranslationModel>
 
-
+    @Query("SELECT * FROM english_words " +
+            "WHERE " +
+            "(:letter = '' OR eWord LIKE :letter || '%')")
+    fun getWordsFirstLetter(letter: String): List<WordTranslationModel>
 
     @Query("SELECT COUNT(*) FROM english_words")
     fun getCount(): Flow<Int>
